@@ -113,7 +113,7 @@ const updatePassword = async () => {
     });
 
     try {
-        const textResponse = await response.text();  // Válasz szöveges formátumbana
+        const textResponse = await response.text();  // Válasz szöveges formátumban
 
         if (response.ok) {
             alert(textResponse);  // A szerver szöveges válaszát megjelenítjük
