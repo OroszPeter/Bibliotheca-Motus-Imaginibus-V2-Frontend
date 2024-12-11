@@ -106,7 +106,7 @@ const updatePassword = async () => {
     const response = await fetch('https://localhost:7214/api/Account/update-password', {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json', a
+            'Content-Type': 'application/json', 
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ oldPassword, newPassword })
