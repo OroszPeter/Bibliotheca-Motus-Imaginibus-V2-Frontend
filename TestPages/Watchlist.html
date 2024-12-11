@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filmkocka Stílusú Szegély</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .film-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .film-border {
+      border-left: 5px solid black;
+      border-right: 5px solid black;
+      padding: 20px;
+      height: 200px;
+      position: relative;
+      background-color: #fff;
+      flex: 1;
+    }
+
+    .film-border:first-child {
+      border-left: 5px solid black;
+    }
+
+    .film-border:last-child {
+      border-right: 5px solid black;
+    }
+
+    .film-border::before,
+    .film-border::after {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: 10px;
+      background-color: black;
+      top: -10px;
+      left: 0;
+    }
+
+    .film-border::after {
+      top: unset;
+      bottom: -10px;
+    }
+
+    .film-holes {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      top: -10px;
+      width: 100%;
+      height: 10px;
+    }
+
+    .film-holes div,
+    .film-holes-bottom div {
+      width: 7px;
+      height: 7px;
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 50%;
+    }
+
+    .film-holes-bottom {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      bottom: -10px;
+      width: 100%;
+      height: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-5">
+    <div class="film-container">
+      <div class="film-border">
+        <div class="film-holes">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="film-holes-bottom">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <h5>Film 1</h5>
+        <p>Tartalom...</p>
+      </div>
+      <div class="film-border">
+        <div class="film-holes">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="film-holes-bottom">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <h5>Film 2</h5>
+        <p>Tartalom...</p>
+      </div>
+      <div class="film-border">
+        <div class="film-holes">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="film-holes-bottom">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <h5>Film 3</h5>
+        <p>Tartalom...</p>
+      </div>
+      <div class="film-border">
+        <div class="film-holes">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="film-holes-bottom">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <h5>Film 4</h5>
+        <p>Tartalom...</p>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
