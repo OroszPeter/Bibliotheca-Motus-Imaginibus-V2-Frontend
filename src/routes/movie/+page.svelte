@@ -1,212 +1,163 @@
-<script>
-    // Szükség esetén állapotváltozók vagy funkciók itt definiálhatók
-</script>
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
+    <script>
+    export let movie; // A film adatokat itt kapjuk a load függvényből
+    let rating = 0; // A kiválasztott csillagok száma
+  
+    // Függvény, amely a csillagok állapotát frissíti
+    function setRating(value) {
+      rating = value;
     }
-    #main {
-        display: flex;
-        gap: 20px; 
-        padding: 20px;
-        background-color: #FFF2D7;
+  
+    // Függvény a hover eseményhez
+    function hoverRating(value) {
+      rating = value;
     }
-    #pic {
-        flex: 1;
+  
+    // A csillagok resetelése
+    function resetRating() {
+      rating = 0;
     }
-    #pic img {
-        max-width: 100%; 
-        display: block;
-    }
-    #content {
-        flex: 2;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    #about {
-        flex: none;
-    }
-    #addcomment .wrapper {
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-    #addcomment .title {
-        font-size: 1.2em;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-    #addcomment textarea {
-        width: 100%;
-        margin-top: 10px;
-        resize: none;
-        padding: 10px;
-    }
-    #addcomment .submit-btn {
-        margin-top: 10px;
-        background-color: #007bff;
-        color: white;
-        text-align: center;
-        padding: 10px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-    .wrapper {
-        background-color: #FF7D29;
-        width: 100%;
-        padding: 0.3rem 0.6rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.3rem;
-        border-radius: 0.25rem;
-        box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-    }
-    .wrapper .title {
-        font-weight: bold;
-        font-size: 0.36rem;
-    }
-    .wrapper .content {
-        line-height: 1.6;
-        color: #FFF2D7;
-    }
-    .rate-box {
-        display: flex;
-        flex-direction: row-reverse;
-        gap: 0.1rem;
-    }
-    .rate-box input {
-        display: none;
-    }
-    .rate-box input:hover ~ .star:before {
-        color: rgba(255, 204, 51, 0.5);
-    }
-    .rate-box input:active + .star:before {
-        transform: scale(0.9);
-    }
-    .rate-box input:checked ~ .star:before {
-        color: #ffcc33;
-        text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.8);
-    }
-    .rate-box .star:before {
-        content: "★";
-        display: inline-block;
-        font-family: "Potta One", cursive;
-        font-size: 25px;
-        cursor: pointer;
-        color: #0000;
-        text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5);
-        background-color: #aaa;
-        background-clip: text;
-        -webkit-background-clip: text;
-        transition: all 0.3s;
+  </script>
+  
+  <main>
+    <div class="container py-5 pt-5 w-75">
+      <table class="pt-5">
+        <tbody>
+          <tr>
+            <td rowspan="2">
+              <!-- Kép -->
+              <div class="picture">
+                <img
+                  src='http://placehold.co/400x600'
+                  class="img-fluid"
+                />
+              </div>
+            </td>
+            <td>
+              <!-- Film cím, műfaj és értékelés -->
+              <div class="content">
+                <h2>
+                  Film címe
+                  <button class="btn btn-primary btn-sm ms-2">+</button>
+                </h2>
+                <p><strong>Műfaj</strong></p>
+                <small>5.0 &#9733;</small>
+                <p>
+                 Leírás
+                </p>
+              </div>
+            </td>
+            <td>
+              <!-- Rendező és színészek táblázat -->
+              <div class="people">
+                <table class="table table-dark table-striped">
+                  <thead>
+                    <tr>
+                      <th>Szereplők</th>
+                      <th>Szerepek</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Rendező</td>
+                      <td>rendező</td>
+                    </tr>
+                    <!-- Színészek itt adhatóak hozzá az API válasza alapján -->
+                    <tr>
+                      <td>Színész 1</td>
+                      <td>Arnold Schwarzenegger</td>
+                    </tr>
+                    <tr>
+                      <td>Színész 2</td>
+                      <td>Linda Hamilton</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <!-- Komment szakasz -->
+              <div class="addcomment mt-4">
+                <div class="star-rating mb-3" on:mouseleave={resetRating}>
+                  <!-- 1. csillag -->
+                  <label for="star1" class="star" on:mouseover={() => hoverRating(1)} on:click={() => setRating(1)}>{rating >= 1 ? '★' : '☆'}</label>
+                  <!-- 2. csillag -->
+                  <label for="star2" class="star" on:mouseover={() => hoverRating(2)} on:click={() => setRating(2)}>{rating >= 2 ? '★' : '☆'}</label>
+                  <!-- 3. csillag -->
+                  <label for="star3" class="star" on:mouseover={() => hoverRating(3)} on:click={() => setRating(3)}>{rating >= 3 ? '★' : '☆'}</label>
+                  <!-- 4. csillag -->
+                  <label for="star4" class="star" on:mouseover={() => hoverRating(4)} on:click={() => setRating(4)}>{rating >= 4 ? '★' : '☆'}</label>
+                  <!-- 5. csillag -->
+                  <label for="star5" class="star" on:mouseover={() => hoverRating(5)} on:click={() => setRating(5)}>{rating >= 5 ? '★' : '☆'}</label>
+                </div>
+                <textarea name="komment" cols="100" rows="4"></textarea>
+                <button class="btn btn-success">Küldés</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+  
+  <style>
+    .container {
+      margin-left: 300px;
+      padding: 20px;
+      color: white;
+      margin-top: 25px;
     }
     textarea {
-        border: none;
-        resize: none;
-        width: 100%;
-        padding: 0.2rem;
-        color: inherit;
-        font-family: inherit;
-        line-height: 1.5;
-        border-radius: 0.2rem;
-        box-shadow: inset 2px 2px 8px rgba(0, 0, 0, 0.3), inset -2px -2px 8px rgba(255, 255, 255, 0.8);
-        background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
     }
-    textarea::placeholder {
-        color: #aaa;
+  
+    table {
+      width: 100%;
+      table-layout: fixed;
     }
-    textarea:focus {
-        outline-color: #ffcc33;
+  
+    .picture,
+    .content,
+    .people {
+      width: 100%;
+      padding: 10px;
     }
-    .btn {
-        padding: 0.2rem 0.5rem;
-        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.8);
-        /* border-radius: 1rem; */
-        cursor: pointer;
-        background-color: #FFBF78;
-        transition: all 0.2s;
-        width: 250px;
-        color: #FF7D29;
+  
+    .star {
+      font-size: 2rem;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.3s ease;
     }
-    .btn:active {
-        transform: translate(2px, 2px);
+  
+    .star.selected,
+    .star:hover,
+    .star:active {
+      color: gold;
     }
-    #addcomment .wrapper {
-    background-color: #FF7D29 !important;
-}
-h1, .th, .title, td{
-    color: #FFBF78;
-}
-.table{
-    border: 1px solid #FF7D29;
-}
-th, td{
-    background-color: #FFF2D7;
-}
-p, small{
-    color: #FF7D29;
-}
-
-
-</style>
-
-<div id="main">
-    <div id="pic">
-        <img src="https://via.placeholder.com/500x700" alt="A film/sorozat képe" />
-    </div>
-    <div id="content">
-        <div id="about">
-            <h1>Cím</h1>
-            <p><small>YYYY</small> (<small>műfaj</small>)<br /></p>
-            <small>mmm mins</small><br />
-            <div id="description">
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Pariatur sint debitis architecto quia voluptatibus obcaecati laudantium ut recusandae voluptatem. Exercitationem non harum deserunt unde suscipit adipisci pariatur blanditiis nisi earum.</p>
-                <div id="people">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th scope="row" class="th">Director</th>
-                                <td>John Doe</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <th scope="row" class="th">Actors</th>
-                                <td>Jane Doe</td>
-                                <td>Karren Koe</td>
-                                <td>Mary Major</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div id="addcomment">
-            <div class="wrapper">
-                <div class="title">Osszd meg véleményed</div>
-                <div class="content">Hogy tetszett amit láttál? Írd meg kommentben!</div>
-                <div class="rate-box">
-                    <input type="radio" name="star" id="star0" />
-                    <label class="star" for="star0"></label>
-                    <input type="radio" name="star" id="star1" />
-                    <label class="star" for="star1"></label>
-                    <input type="radio" name="star" id="star2" checked />
-                    <label class="star" for="star2"></label>
-                    <input type="radio" name="star" id="star3" />
-                    <label class="star" for="star3"></label>
-                    <input type="radio" name="star" id="star4" />
-                    <label class="star" for="star4"></label>
-                </div>
-                <textarea cols="24" rows="5" placeholder=""></textarea>
-                <div class="btn mt-3">Küldés</div>
-            </div>
-        </div>
-    </div>
-</div>
+  
+    .star-rating label:hover,
+    .star-rating label.selected {
+      color: gold;
+    }
+  
+    .table th,
+    .table td {
+      vertical-align: middle;
+    }
+  
+    .star-rating label {
+      margin: 0 5px;
+    }
+  
+    .addcomment {
+      max-width: 100%;
+    }
+  
+    .star-rating {
+      display: flex;
+      justify-content: flex-start;
+    }
+  </style>
+  

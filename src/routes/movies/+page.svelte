@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-
+  // A 'Link' komponenst eltávolítjuk, mivel nincs a @sveltejs/kit-ben
   let movies = []; // Filmek tárolása
   let ratings = []; // Értékelések tárolása
   let categorizedMovies = {}; // Filmek kategorizálása műfajok szerint
@@ -34,15 +34,15 @@
 
       // Lekérjük a képeket minden filmhez
       await Promise.all(
-  movies.map(async (movie) => {
-    try {
-      movie.imageUrl = `https://localhost:7214/api/Movie/${movie.id}/kep`; // Közvetlen kép URL
-    } catch (error) {
-      console.error(`Hiba a(z) ${movie.title} képének betöltésekor:`, error);
-      movie.imageUrl = 'https://placehold.co/400x600'; // Placeholder kép
-    }
-  })
-);
+        movies.map(async (movie) => {
+          try {
+            movie.imageUrl = `https://localhost:7214/api/Movie/${movie.id}/kep`; // Közvetlen kép URL
+          } catch (error) {
+            console.error(`Hiba a(z) ${movie.title} képének betöltésekor:`, error);
+            movie.imageUrl = 'https://placehold.co/400x600'; // Placeholder kép
+          }
+        })
+      );
 
     } catch (error) {
       console.error('Hiba a filmek vagy értékelések betöltésekor:', error);
@@ -57,9 +57,8 @@
     color: white;
   }
 
-  /* Kártya alapstílus */
   .card {
-    border: none;
+    border: 5px solid #811331;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     background-color: #333333;
     color: white;
@@ -77,9 +76,9 @@
   }
 
   .image-container {
-    width: 100%; /* Szülő elem szélessége */
-    height: 450px; /* Fix magasság */
-    overflow: hidden; /* Ha a kép túl nagy, levágjuk */
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -88,7 +87,7 @@
   .card-img-top {
     max-width: 100%;
     max-height: 100%;
-    object-fit: cover; /* A kép méretezése úgy, hogy teljesen kitöltse a területet */
+    object-fit: cover;
   }
 
   .badge {
@@ -103,9 +102,9 @@
     z-index: 1;
     text-align: center;
     font-size: 0.9rem;
-    display: flex; /* Flexbox a középre igazításhoz */
-    justify-content: center; /* Vízszintes középre igazítás */
-    align-items: center; /* Függőleges középre igazítás */
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .card-body {
@@ -138,13 +137,14 @@
         {#each categorizedMovies[genre] as movie}
           <div class="col-md-3 mb-4">
             <div class="card">
-              <!-- Link a képhez -->
-              <a href="https://www.google.com/search?q={movie.title}" class="image-link">
+              <!-- Link a képhez, most már <a> tagot használunk -->
+                <a href={`/movies/${movie.id}`} class="image-link" on:click={() => console.log('Navigating to movie id:', movie.id)}>
                 <div class="image-container">
                   <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
-                  <div class="badge">{movie.averageRating.toFixed(1)}</div> <!-- Az átlagos értékelés -->
+                  <div class="badge">{movie.averageRating.toFixed(1)}</div>
                 </div>
-              </a>
+              </a>              
+
               <div class="card-body">
                 <h5 class="card-title">{movie.title}</h5>
                 <small class="text-muted">{movie.genre}</small>
