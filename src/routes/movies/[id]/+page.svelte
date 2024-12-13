@@ -1,8 +1,15 @@
 <script>
-  export let movie;  // A load függvényből kapott filmadatok
+  import { page } from '$app/stores';
 
-  // Ellenőrizzük, hogy a movie elérhető-e
-  let isLoading = !movie;
+  let movie = $page.data.movie;
+
+  // Ellenőrizzük, hogy az adatok töltése befejeződött-e
+  let isLoading = false;
+
+  $: if (!movie) {
+    isLoading = true;
+  }
+
   console.log('Movie data received in [id] component:', movie);
 </script>
 
@@ -32,7 +39,7 @@
                                   <button class="btn btn-primary btn-sm ms-2">+</button>
                               </h2>
                               <p><strong>{movie.genre}</strong></p>
-                              <small>{movie.averageRating.toFixed(1)} &#9733;</small>
+                              <small>&#9733;</small>
                               <p>
                                   {movie.description || 'Film leírás nem elérhető.'}
                               </p>
@@ -70,13 +77,13 @@
                       <td colspan="2">
                           <!-- Komment szakasz -->
                           <div class="addcomment mt-4">
-                              <div class="star-rating mb-3" on:mouseleave={resetRating}>
+                              <div class="star-rating mb-3">
                                   <!-- Csillagok -->
-                                  <label for="star1" class="star" on:mouseover={() => hoverRating(1)} on:click={() => setRating(1)}>{rating >= 1 ? '★' : '☆'}</label>
-                                  <label for="star2" class="star" on:mouseover={() => hoverRating(2)} on:click={() => setRating(2)}>{rating >= 2 ? '★' : '☆'}</label>
-                                  <label for="star3" class="star" on:mouseover={() => hoverRating(3)} on:click={() => setRating(3)}>{rating >= 3 ? '★' : '☆'}</label>
-                                  <label for="star4" class="star" on:mouseover={() => hoverRating(4)} on:click={() => setRating(4)}>{rating >= 4 ? '★' : '☆'}</label>
-                                  <label for="star5" class="star" on:mouseover={() => hoverRating(5)} on:click={() => setRating(5)}>{rating >= 5 ? '★' : '☆'}</label>
+                                  <label for="star1" class="star" on:mouseover={() => hoverRating(1)} on:click={() => setRating(1)}>{0 >= 1 ? '★' : '☆'}</label>
+                                  <label for="star2" class="star" on:mouseover={() => hoverRating(2)} on:click={() => setRating(2)}>{0 >= 2 ? '★' : '☆'}</label>
+                                  <label for="star3" class="star" on:mouseover={() => hoverRating(3)} on:click={() => setRating(3)}>{0 >= 3 ? '★' : '☆'}</label>
+                                  <label for="star4" class="star" on:mouseover={() => hoverRating(4)} on:click={() => setRating(4)}>{0 >= 4 ? '★' : '☆'}</label>
+                                  <label for="star5" class="star" on:mouseover={() => hoverRating(5)} on:click={() => setRating(5)}>{0 >= 5 ? '★' : '☆'}</label>
                               </div>
                               <textarea name="komment" cols="100" rows="4"></textarea>
                               <button class="btn btn-success">Küldés</button>

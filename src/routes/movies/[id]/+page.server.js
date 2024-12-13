@@ -11,18 +11,16 @@ export async function load({ params }) {
         const movieResponse = await fetch(`https://localhost:7214/api/Movie/${id}`, { agent });
         if (!movieResponse.ok) {
             console.error('Failed to fetch movie:', movieResponse.status);
-            return { props: { movie: null } };
+            return { movie: null }; // Visszaadjuk, hogy null legyen az adat
         }
 
         const movie = await movieResponse.json();
         console.log('Movie data fetched:', movie);
 
-        // Additional logic (image and ratings fetching) goes here...
-
-        return { props: { movie } };
+        return { movie };
 
     } catch (error) {
         console.error('Error loading movie data:', error);
-        return { props: { movie: null } };
+        return { movie: null };
     }
 }
