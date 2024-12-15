@@ -19,40 +19,71 @@
 
 
     async function handleLogin() {
-    try {
-        const response = await fetch('https://localhost:7214/api/Account/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(loginData)
-        });
+        try {
+            const response = await fetch('https://localhost:7214/api/Account/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            });
 
-        if (!response.ok) {
-            throw new Error('Bejelentkezési hiba');
+            if (!response.ok) {
+                throw new Error('Bejelentkezési hiba');
+            }
+
+            const data = await response.json();
+            const token = data.token;
+
+            // Token mentése a localStorage-ba és store-ba
+            localStorage.setItem('authToken', token);
+            authToken.set({ token });
+
+            // Felhasználói adatok lekérése
+            const userResponse = await fetch('https://localhost:7214/api/Account/me', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!userResponse.ok) {
+                throw new Error('Felhasználói adatok lekérése sikertelen');
+            }
+
+            const userData = await userResponse.json();
+
+            // Felhasználói adatok mentése a localStorage-ba és store-ba
+            localStorage.setItem('user', JSON.stringify(userData));
+            userStore.set(userData);
+
+            // Bejelentkezett állapot frissítése
+            isLoggedIn.set(true);
+
+            // Sikerüzenet megjelenítése
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Sikeres bejelentkezés!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'green';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                window.location.href = "/"; // Átirányítás a főoldalra
+            }, 3000);
+        } catch (error) {
+            console.error('Bejelentkezési hiba:', error);
+            alert('Sikertelen bejelentkezés');
         }
-
-        // A válasz JSON-ban van, így közvetlenül kinyerjük a token-t
-        const data = await response.json(); // Parse JSON-t
-        const token = data.token;  // Kivesszük a token értéket
-
-// A token mentése a localStorage-ba és store-ba
-localStorage.setItem('authToken', token);  // Token mentése a localStorage-ba
-authToken.set({ token });  // Token objektumként beállítása a store-ba
-
-console.log('Token sikeresen betöltve:', token);  // Közvetlenül a token string-et kiíratjuk
-
-isLoggedIn.set(true);
-alert('Sikeres bejelentkezés!');
-window.location.href = "/"; // Átirányítás a főoldalra
-        isLoggedIn.set(true);
-        alert('Sikeres bejelentkezés!');
-        window.location.href = "/"; // Átirányítás a főoldalra
-    } catch (error) {
-        console.error('Bejelentkezési hiba:', error);
-        alert('Sikertelen bejelentkezés');
     }
-}
     async function handleRegister() {
         try {
             const response = await fetch('https://localhost:7214/api/Account/register', {

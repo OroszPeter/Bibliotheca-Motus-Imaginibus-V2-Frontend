@@ -1,0 +1,21 @@
+Backend fejlesztéshez
+ - Movie -> szükséges elemek:
+				- Actors (string lista)
+				- AddedAt (datetime.now()-ként szerepeljen
+				  a Post movieban.) -> Újdonságok oldalhoz
+				- Description (string rövid leírás a filmről)
+ - Series -> Sorozatok:
+			- Új entitás vagy a meglévő movie alapján
+			- Új elemek:
+					- NumberOfSeasons (int)
+					- NumberOfEpisodes (int)
+					- Lenght (int, ez maradhat, csak
+						epizódonkénti átlaghossz)
+					- AddedAt (ugyanaz mint a movie-nál)
+
+AccountController:
+		delete-user végpont: adott user törlése az adatbázisból
+
+Seedelés:
+	- Adatok seedelése: Filmek, Sorozatok, Értékeléses, Felhasználók (ADMIN role)
+	- Magyarul!!!!!!
