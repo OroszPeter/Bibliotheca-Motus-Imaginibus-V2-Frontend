@@ -71,7 +71,7 @@
     }
 
     async function deleteRating(id) {
-        // Token lekérése a store-ból
+        // token lekérése a store-ból
         const token = getStoreValue(authToken)?.token;
 
         if (!token) {
