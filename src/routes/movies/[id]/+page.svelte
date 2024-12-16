@@ -124,7 +124,7 @@
     {#if isLoading}
         <div>Betöltés...</div>
     {:else if movie}
-        <div class="container py-5 pt-5 w-75">
+        <div class="container pt-5 w-75">
             <table class="pt-5">
                 <tbody>
                     <tr>
@@ -137,7 +137,7 @@
                                 {/if}
                             </div>
                         </td>
-                        <td>
+                        <td class="desc">
                             <div class="content">
                                 <h2>
                                     {movie.title}
@@ -145,7 +145,7 @@
                                 </h2>
                                 <p><strong>{movie.genre}</strong></p>
                                 <small>{averageRating.toFixed(1)} &#9733;</small>
-                                <p>{movie.description || 'Film leírás nem elérhető.'}</p>
+                                <p class="description">{movie.description || 'Film leírás nem elérhető.'}</p>
                             </div>
                         </td>
                         <td>
@@ -176,7 +176,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2">
+                        <td class="comment" colspan="2">
                             <div class="addcomment mt-4">
                                 <div class="star-rating mb-3" on:mouseleave={resetRating}>
                                     {#each Array(5).fill(0) as _, index}
@@ -200,7 +200,6 @@
                                 <h3>Értékelések:</h3>
                                 {#each movieRatings as rating}
                                     <div class="rating">
-                                        <p><strong>{rating.userId}</strong>: {rating.comment}</p>
                                         <div>
                                             {#each Array(rating.ratingNumber).fill('★') as _}
                                                 <span class="star">★</span>
@@ -208,6 +207,7 @@
                                             {#each Array(5 - rating.ratingNumber).fill('☆') as _}
                                                 <span class="star">☆</span>
                                             {/each}
+                                            <p><strong>{rating.userId}</strong>: {rating.comment}</p>
                                         </div>
                                         {#if getStoreValue(userStore)?.id === rating.userId}
                                             <button class="btn btn-danger" on:click={() => deleteRating(rating.id)}>Törlés</button>
@@ -227,9 +227,10 @@
 
 <style>
     .container {
-        margin-left: 300px;
-        padding: 20px;
-        color: white;
+      margin-left: 300px;
+      padding: 20px;
+      color: white;
+      margin-top: 25px;
     }
     .ratings-section {
         margin-top: 20px;
@@ -243,8 +244,14 @@
         margin: 0;
         color: #ddd;
     }
+    .picture,
+    .content,
+    .people {
+      width: 100%;
+      padding: 10px;
+    }
     .star {
-        font-size: 1.5rem;
+        font-size: 2.0rem;
         color: gold;
         cursor: pointer;
     }
@@ -253,6 +260,9 @@
     }
     img {
         width: 400px;
-        height: 600px;
+        height: 700px;
+    }
+    .desc{
+        width: 300px;
     }
 </style>

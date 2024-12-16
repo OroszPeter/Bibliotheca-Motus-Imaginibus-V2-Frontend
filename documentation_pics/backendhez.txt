@@ -12,9 +12,15 @@ Backend fejlesztéshez
 					- Lenght (int, ez maradhat, csak
 						epizódonkénti átlaghossz)
 					- AddedAt (ugyanaz mint a movie-nál)
+Rating -> AddedAt (datetime.now())
 
 AccountController:
 		delete-user végpont: adott user törlése az adatbázisból
+WatchlistController
+		/me végpont: az adott bejelentkezett userhez tartozó összes film visszaadása
+		- ne kelljen userid-t megadni a POST-hoz
+RatingController:
+		- ne kelljen userid-t megadni a POST-hoz
 
 Seedelés:
 	- Adatok seedelése: Filmek, Sorozatok, Értékeléses, Felhasználók (ADMIN role)

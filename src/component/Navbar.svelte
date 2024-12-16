@@ -4,8 +4,9 @@
 
   let searchQuery = '';
   const handleSearch = () => {
-      alert(`Keresés indítva: ${searchQuery}`);
-  };
+    // Átirányítás a keresett kifejezés alapján a result oldalra
+    window.location.href = `/result?query=${searchQuery}`;
+};
 
   $: isUserLoggedIn = $isLoggedIn; // Automatikus frissítés a store alapján
   $: userName = $userStore.userName || ''; // Felhasználónév figyelése
@@ -201,6 +202,9 @@
       left: 0;
       width: 100%;
       z-index: 2;
+    }
+    input{
+      color: white;
     }
   </style>
   

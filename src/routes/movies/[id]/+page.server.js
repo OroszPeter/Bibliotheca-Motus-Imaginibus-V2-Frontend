@@ -12,12 +12,6 @@ export async function load({ params }) {
 
         const movie = await movieResponse.json();
 
-        // Film képének lekérése
-        const imageResponse = await fetch(`https://localhost:7214/api/Movie/${id}/kep`, { agent });
-        if (!imageResponse.ok) throw new Error('Failed to fetch movie image');
-
-        const imageUrl = await imageResponse.text();
-
         // Értékelések lekérése
         const ratingsResponse = await fetch('https://localhost:7214/api/Ratings', { agent });
         if (!ratingsResponse.ok) throw new Error('Failed to fetch ratings');
@@ -31,10 +25,10 @@ export async function load({ params }) {
         const averageRating = 
             movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length || 0;
 
-        return { movie, imageUrl, movieRatings, averageRating };
+        return { movie, movieRatings, averageRating };
 
     } catch (error) {
         console.error('Error loading data:', error);
-        return { movie: null, imageUrl: '', movieRatings: [], averageRating: 0 };
+        return { movie: null, movieRatings: [], averageRating: 0 };
     }
 }
