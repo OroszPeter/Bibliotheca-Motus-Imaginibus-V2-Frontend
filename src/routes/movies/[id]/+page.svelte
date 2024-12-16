@@ -164,11 +164,11 @@
                                         </tr>
                                         <tr>
                                             <td></td>
-                                            <td>Arnold Schwarzenegger</td>
+                                            <td>---</td>
                                         </tr>
                                         <tr>
                                             <td></td>
-                                            <td>Linda Hamilton</td>
+                                            <td>---</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -189,7 +189,7 @@
                                         </label>
                                     {/each}
                                 </div>
-                                <textarea bind:value={comment} name="komment" cols="75" rows="4"></textarea>
+                                <textarea bind:value={comment} name="komment" cols="75" rows="4"></textarea><br>
                                 <button class="btn btn-success" on:click={submitRating}>Küldés</button>
                             </div>
                         </td>
