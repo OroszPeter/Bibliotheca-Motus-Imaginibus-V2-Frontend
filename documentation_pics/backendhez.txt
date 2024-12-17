@@ -13,6 +13,8 @@ Backend fejlesztéshez
 						epizódonkénti átlaghossz)
 					- AddedAt (ugyanaz mint a movie-nál)
 Rating -> AddedAt (datetime.now())
+MovieController:
+			- POST-nál adja vissza a létrejött movie id-ját
 
 AccountController:
 		delete-user végpont: adott user törlése az adatbázisból

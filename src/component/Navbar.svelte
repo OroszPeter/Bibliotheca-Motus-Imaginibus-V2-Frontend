@@ -17,6 +17,7 @@
       { name: "Filmek", link: "/movies" },
       { name: "Sorozatok", link: "/series" },
       { name: "Watchlist", link: "/watchlist" },
+      { name: "Új tartalom hozzáadása", link: "/add-movie" },
       ...(isUserLoggedIn
           ? [{ name: "Kijelentkezés", link: "#logout" }]
           : [{ name: "Bejelentkezés", link: "/login" }]),

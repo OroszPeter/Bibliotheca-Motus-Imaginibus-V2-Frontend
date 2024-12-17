@@ -9,6 +9,8 @@
     let rating = 0;
     let hoverRatingValue = 0;
     let comment = '';
+    let toast = { message: '', type: '', visible: false };
+    let users = {}; // User ID -> username tárolása
 
     // Segédfüggvény a store-értékek szinkron kiolvasására
     function getStoreValue(store) {
@@ -29,22 +31,36 @@
         hoverRatingValue = 0;
     }
 
+    function showToast(message, type) {
+        toast = { message, type, visible: true };
+        setTimeout(() => (toast.visible = false), 3000);
+    }
+
+    async function fetchUsernames() {
+        try {
+            const response = await fetch('https://localhost:7214/api/Users');
+            if (!response.ok) throw new Error('Nem sikerült a felhasználók betöltése.');
+
+            const userData = await response.json();
+            users = userData.reduce((acc, user) => {
+                acc[user.id] = user.username;
+                return acc;
+            }, {});
+        } catch (error) {
+            console.error('Hiba a felhasználónevek lekérdezésekor:', error);
+        }
+    }
+
     async function submitRating() {
-        // Token és userId lekérése a store-okból
         const token = getStoreValue(authToken)?.token;
         const userId = getStoreValue(userStore)?.id;
 
         if (!userId || !token) {
-            alert('Hiba: Bejelentkezés szükséges az értékeléshez.');
+            showToast('Hiba: Bejelentkezés szükséges az értékeléshez.', 'error');
             return;
         }
 
-        const newRating = {
-            movieId: movie.id,
-            ratingNumber: rating,
-            userId,
-            comment
-        };
+        const newRating = { movieId: movie.id, ratingNumber: rating, userId, comment };
 
         try {
             const response = await fetch('https://localhost:7214/api/Ratings', {
@@ -56,26 +72,25 @@
                 body: JSON.stringify(newRating)
             });
 
-            if (!response.ok) {
-                throw new Error('Nem sikerült az értékelés elküldése.');
-            }
+            if (!response.ok) throw new Error('Nem sikerült az értékelés elküldése.');
 
             const addedRating = await response.json();
+            addedRating.username = users[userId] || 'Ismeretlen felhasználó';
             movieRatings = [...movieRatings, addedRating];
             comment = '';
             rating = 0;
-            alert('Értékelés elküldve!');
+            showToast('Értékelés elküldve!', 'success');
         } catch (error) {
             console.error('Hiba az értékelés beküldésekor:', error);
+            showToast('Nem sikerült az értékelés elküldése.', 'error');
         }
     }
 
     async function deleteRating(id) {
-        // token lekérése a store-ból
         const token = getStoreValue(authToken)?.token;
 
         if (!token) {
-            alert('Hiba: Bejelentkezés szükséges az értékelés törléséhez.');
+            showToast('Hiba: Bejelentkezés szükséges az értékelés törléséhez.', 'error');
             return;
         }
 
@@ -87,27 +102,25 @@
                 }
             });
 
-            if (!response.ok) {
-                throw new Error('Nem sikerült az értékelés törlése.');
-            }
+            if (!response.ok) throw new Error('Nem sikerült az értékelés törlése.');
 
             movieRatings = movieRatings.filter(rating => rating.id !== id);
-            alert('Értékelés törölve!');
+            showToast('Értékelés törölve!', 'error');
         } catch (error) {
             console.error('Hiba az értékelés törlésekor:', error);
+            showToast('Nem sikerült az értékelés törlése.', 'error');
         }
     }
 
     onMount(async () => {
         try {
+            await fetchUsernames();
             if (movie) {
                 const movieId = movie.id;
                 imageUrl = `https://localhost:7214/api/Movie/${movieId}/kep`;
 
                 const response = await fetch(imageUrl);
-                if (!response.ok) {
-                    throw new Error('Kép nem érhető el');
-                }
+                if (!response.ok) throw new Error('Kép nem érhető el');
             } else {
                 imageUrl = 'https://placehold.co/400x600';
             }
@@ -207,7 +220,7 @@
                                             {#each Array(5 - rating.ratingNumber).fill('☆') as _}
                                                 <span class="star">☆</span>
                                             {/each}
-                                            <p><strong>{rating.userId}</strong>: {rating.comment}</p>
+                                            <p><strong>{rating.username || 'Ismeretlen felhasználó'}</strong>: {rating.comment}</p>
                                         </div>
                                         {#if getStoreValue(userStore)?.id === rating.userId}
                                             <button class="btn btn-danger" on:click={() => deleteRating(rating.id)}>Törlés</button>
@@ -223,14 +236,18 @@
     {:else}
         <div>Nem található a film adata.</div>
     {/if}
+
+    <div class="toast" class:success={toast.type === 'success'} class:error={toast.type === 'error'} class:visible={toast.visible}>
+        {toast.message}
+    </div>
 </main>
 
 <style>
     .container {
-      margin-left: 300px;
-      padding: 20px;
-      color: white;
-      margin-top: 25px;
+        margin-left: 300px;
+        padding: 20px;
+        color: white;
+        margin-top: 25px;
     }
     .ratings-section {
         margin-top: 20px;
@@ -247,8 +264,8 @@
     .picture,
     .content,
     .people {
-      width: 100%;
-      padding: 10px;
+        width: 100%;
+        padding: 10px;
     }
     .star {
         font-size: 2.0rem;
@@ -262,7 +279,28 @@
         width: 400px;
         height: 700px;
     }
-    .desc{
+    .desc {
         width: 300px;
+    }
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        transform: translateY(-20px);
+    }
+    .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .toast.success {
+        background-color: #28a745;
+    }
+    .toast.error {
+        background-color: #dc3545;
     }
 </style>

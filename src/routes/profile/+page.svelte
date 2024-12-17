@@ -13,6 +13,8 @@
     $: isUserLoggedIn = $isLoggedIn;
     $: userName = $userStore.userName || '';
     $: email = $userStore.email || '';
+    $: firstName = $userStore.firstName || '';
+    $: lastName = $userStore.lastName || '';
 
     // Az authToken store-ból kinyerjük a token-t
     let token = $authToken.token;  // Itt már az authToken store értékét használjuk
@@ -161,7 +163,7 @@ const updatePassword = async () => {
     <div class="container mt-4">
         <main>
             <div id="details">
-                <h1 class="text-center pb-5">Felhasználó neve</h1>
+                <h1 class="text-center pb-5">{lastName} {firstName}</h1>
                 <table class="table">
                     <tbody>
                         <tr>
