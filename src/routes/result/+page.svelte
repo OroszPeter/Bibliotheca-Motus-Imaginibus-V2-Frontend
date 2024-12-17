@@ -60,7 +60,7 @@
             console.log(`Average rating for movie ${movie.id}:`, movie.averageRating);
           });
 
-          // Force Svelte to recognize changes
+          // Force Svelte to recognize the changes
           movies = [...movies];
         }
       }
