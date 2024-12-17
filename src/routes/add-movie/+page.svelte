@@ -20,7 +20,7 @@
       releasedDate: releasedDate ? new Date(releasedDate).toISOString() : "",  // Formázd ISO formátumra
       genre,
       length
-    };a
+    };aa
 
     console.log("POST kérés a film létrehozásához:", movieData);
 
