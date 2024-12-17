@@ -10,7 +10,7 @@
     let hoverRatingValue = 0;
     let comment = '';
     let toast = { message: '', type: '', visible: false };
-    let users = {}; // User ID -> username tárolása
+    let users = {}; // User ID -> username tárolás
 
     // Segédfüggvény a store-értékek szinkron kiolvasására
     function getStoreValue(store) {
