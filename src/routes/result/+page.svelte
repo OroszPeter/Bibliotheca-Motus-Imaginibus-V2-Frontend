@@ -4,23 +4,65 @@
   let searchQuery = '';
   let movies = [];
   let totalResults = 0;
+  let ratings = [];
 
-  // API lekérés, ha van query
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
     searchQuery = urlParams.get('query');
-    
+
     if (searchQuery) {
+      // Fetch movies based on search query
       const response = await fetch(`https://localhost:7214/api/Movie/search?query=${searchQuery}`);
       if (response.ok) {
         const data = await response.json();
-        movies = data.map(movie => ({
-          id: movie.id, // hozzáadjuk az id-t is
+        movies = data.map((movie) => ({
+          id: movie.id,
           title: movie.title,
-          description: movie.genre, // Példa alapján a "genre" a description
-          image: `https://placehold.co/400x600` // Ha nem érkezik kép, ezt használjuk
+          description: movie.genre,
+          image: `https://placehold.co/400x600`, // Placeholder
+          averageRating: 'N/A', // Default value
         }));
-        totalResults = movies.length; // A találatok száma
+        totalResults = movies.length;
+
+        console.log('Movie search results:', movies);
+
+        // Fetch images for each movie
+        await Promise.all(
+          movies.map(async (movie) => {
+            try {
+              movie.image = `https://localhost:7214/api/Movie/${movie.id}/kep`;
+              console.log(`Image URL for movie ${movie.id}: ${movie.image}`);
+            } catch (error) {
+              console.error(`Error loading image for movie ${movie.title}:`, error);
+            }
+          })
+        );
+
+        // Fetch ratings
+        const ratingsResponse = await fetch('https://localhost:7214/api/Ratings');
+        if (ratingsResponse.ok) {
+          ratings = await ratingsResponse.json();
+          console.log('Ratings:', ratings);
+
+          // Calculate average rating for each movie
+          movies.forEach((movie) => {
+            const movieRatings = ratings.filter((rating) => rating.movieId === movie.id);
+            console.log(`Ratings for movie ${movie.id}:`, movieRatings);
+
+            if (movieRatings.length > 0) {
+              const average =
+                movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) /
+                movieRatings.length;
+              movie.averageRating = average.toFixed(1);
+            } else {
+              movie.averageRating = 'N/A';
+            }
+            console.log(`Average rating for movie ${movie.id}:`, movie.averageRating);
+          });
+
+          // Force Svelte to recognize changes
+          movies = [...movies];
+        }
       }
     }
   });
@@ -33,12 +75,11 @@
       <div class="row">
         {#each movies as movie}
         <div class="col-md-3 mb-4">
-          <div class="card" id={`movie-${movie.id}`}> <!-- Card id dinamikus beállítása -->
-            <!-- A film linkjének módosítása, az id-vel -->
+          <div class="card" id={`movie-${movie.id}`}>
             <a href={`/movies/${movie.id}`} class="image-link">
               <div class="image-container">
                 <img src={movie.image} class="card-img-top" alt={movie.title} />
-                <div class="badge">5.0</div>
+                <div class="badge">{movie.averageRating || 'N/A'}</div>
               </div>
             </a>
             <div class="card-body">
@@ -54,17 +95,16 @@
 
   <style>
     .content {
-      margin-left: 300px; /* Sidebar szélességének megfelelő eltolás */
-      padding: 20px; /* Extra belső tér a tartalom körül */
-      color: white; /* Alapértelmezett fehér szín a szövegekhez */
+      margin-left: 300px;
+      padding: 20px;
+      color: white;
     }
 
-    /* Kártya alapstílus */
     .card {
       border: none;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      background-color: #333333; /* Eredeti háttérszín */
-      color: white; /* Fehér szín a kártya szövegeinek */
+      background-color: #333333;
+      color: white;
     }
 
     .card:hover {
@@ -73,54 +113,54 @@
       transition: all 0.3s ease-in-out;
     }
 
-    /* Link a képen */
     .image-link {
-      display: block; /* A link legyen blokkszintű, hogy a teljes képet lefedje */
-      text-decoration: none; /* Link alapértelmezett aláhúzása eltávolítva */
+      display: block;
+      text-decoration: none;
     }
 
-    /* A képre vonatkozó stílusok */
     .image-container {
       position: relative;
     }
 
     .card-img-top {
-      padding-bottom: 10px; /* A kép és a szöveg közötti távolság csökkentése */
-      margin-bottom: 10px; /* Kis távolság a kép alatt */
+      padding-bottom: 10px;
+      margin-bottom: 10px;
     }
 
-    /* Sárga ovális elem a kép felső részén */
     .badge {
       position: absolute;
       top: -10px;
       left: 50%;
       transform: translateX(-50%);
-      background-color: #ffc107; /* Sárga szín */
+      background-color: #ffc107;
       width: 50px;
       height: 20px;
-      border-radius: 50px; /* Ovális forma */
-      z-index: 5; /* A badge biztosan a kép előtt legyen */
+      border-radius: 50px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
     }
 
-    /* Kártya tartalmának illesztése */
     .card-body {
-      padding-top: 5px; /* Kevesebb padding a tetején */
-      padding-bottom: 5px; /* Kevesebb padding az alján */
+      padding-top: 5px;
+      padding-bottom: 5px;
     }
 
     .card-title {
-      margin-bottom: 5px; /* A cím és a leírás közötti távolság csökkentése */
-      color: white; /* Cím színének fehérre állítása */
+      margin-bottom: 5px;
+      color: white;
     }
 
-    /* Fehér szín a small tag számára */
     small {
-      font-size: 0.875rem; /* A leírás szöveg méretének csökkentése */
-      color: white !important; /* Biztosítja, hogy a small szöveg fehér legyen */
+      font-size: 0.875rem;
+      color: white !important;
     }
 
     .card:hover .card-body {
-      background-color: #333333; /* Az alap háttérszín megmarad hover során is */
+      background-color: #333333;
     }
   </style>
-</main>
+</main>a
