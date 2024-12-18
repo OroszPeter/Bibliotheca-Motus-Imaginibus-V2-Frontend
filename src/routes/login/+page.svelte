@@ -166,13 +166,13 @@
                             <h3 class="title">Bejelentkezés</h3>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-person-square"></i></span>
-                                <input class="form-control" type="text" placeholder="Felhasználónév" bind:value={loginData.userName}>
+                                <input id="username" class="form-control" type="text" placeholder="Felhasználónév" bind:value={loginData.userName}>
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-lock-fill"></i></span>
-                                <input class="form-control" type="password" placeholder="Jelszó" bind:value={loginData.password}>
+                                <input id="password" class="form-control" type="password" placeholder="Jelszó" bind:value={loginData.password}>
                             </div>
-                            <button class="btn signin bg-danger">Bejelentkezés</button>
+                            <button id="login" class="btn signin bg-danger">Bejelentkezés</button>
                             <span class="forgot-pass">
                                 <a href="#">Elfelejtetted a Felhasználóneved/Jelszavad?</a>
                             </span>

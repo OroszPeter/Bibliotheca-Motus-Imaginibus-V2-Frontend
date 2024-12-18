@@ -202,8 +202,8 @@
                                         </label>
                                     {/each}
                                 </div>
-                                <textarea bind:value={comment} name="komment" cols="75" rows="4"></textarea><br>
-                                <button class="btn btn-success" on:click={submitRating}>Küldés</button>
+                                <textarea bind:value={comment} name="komment" cols="75" rows="4" id="comment"></textarea><br>
+                                <button id="send" class="btn btn-success" on:click={submitRating}>Küldés</button>
                             </div>
                         </td>
                     </tr>

@@ -7,14 +7,18 @@
   let ratings = [];
 
   onMount(async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    searchQuery = urlParams.get('query');
+  const urlParams = new URLSearchParams(window.location.search);
+  searchQuery = urlParams.get('query');
 
-    if (searchQuery) {
-      // Fetch movies based on search query
-      const response = await fetch(`https://localhost:7214/api/Movie/search?query=${searchQuery}`);
-      if (response.ok) {
-        const data = await response.json();
+  if (searchQuery) {
+    // Fetch movies based on search query
+    const response = await fetch(`https://localhost:7214/api/Movie/search?query=${searchQuery}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.length === 0) {
+        totalResults = 0;
+        movies = [];
+      } else {
         movies = data.map((movie) => ({
           id: movie.id,
           title: movie.title,
@@ -24,14 +28,11 @@
         }));
         totalResults = movies.length;
 
-        console.log('Movie search results:', movies);
-
         // Fetch images for each movie
         await Promise.all(
           movies.map(async (movie) => {
             try {
               movie.image = `https://localhost:7214/api/Movie/${movie.id}/kep`;
-              console.log(`Image URL for movie ${movie.id}: ${movie.image}`);
             } catch (error) {
               console.error(`Error loading image for movie ${movie.title}:`, error);
             }
@@ -42,36 +43,30 @@
         const ratingsResponse = await fetch('https://localhost:7214/api/Ratings');
         if (ratingsResponse.ok) {
           ratings = await ratingsResponse.json();
-          console.log('Ratings:', ratings);
 
           // Calculate average rating for each movie
           movies.forEach((movie) => {
             const movieRatings = ratings.filter((rating) => rating.movieId === movie.id);
-            console.log(`Ratings for movie ${movie.id}:`, movieRatings);
 
             if (movieRatings.length > 0) {
-              const average =
-                movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) /
-                movieRatings.length;
+              const average = movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length;
               movie.averageRating = average.toFixed(1);
             } else {
               movie.averageRating = 'N/A';
             }
-            console.log(`Average rating for movie ${movie.id}:`, movie.averageRating);
           });
-
-          // Force Svelte to recognize the changes
-          movies = [...movies];
+          movies = [...movies]; // Force reactivity in Svelte
         }
       }
     }
-  });
+  }
+});
 </script>
 
 <main>
   <div class="content mt-5">
     <div class="container mt-4">
-      <h2 class="mb-5">Összesen: {totalResults} találat</h2>
+      <h2 id="resultnumber" class="mb-5">Összesen: {totalResults} találat</h2>
       <div class="row">
         {#each movies as movie}
         <div class="col-md-3 mb-4">
