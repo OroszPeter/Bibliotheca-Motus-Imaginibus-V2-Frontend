@@ -49,7 +49,7 @@
             <a href={`/movies/${movie.id}`} class="image-link">
               <div class="image-container">
                 <img src={movie.image} class="card-img-top" alt={movie.title} />
-                <div class="badge">{movie.averageRating}</div> <!-- Átlagértékelés a sárga oválisba -->
+                <div class="badge">{movie.averageRating}</div> <!-- Átlagértékelés a sárga oválisban -->
               </div>
             </a>
             <div class="card-body">
