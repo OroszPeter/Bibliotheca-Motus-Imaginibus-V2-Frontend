@@ -166,22 +166,22 @@
                                 <table class="table table-dark table-striped">
                                     <thead>
                                         <tr>
-                                            <th></th>
-                                            <th>Szereplő</th>
+                                            <th colspan="2" class="text-center">Rendezte</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Rendező</td>
-                                            <td>{movie.director}</td>
+                                            <td colspan="2" class="text-center">{movie.director}</td>
+                                        </tr>
+                                        <tr><td colspan="2" class="text-center"><strong>Színészek</strong></td></tr>
+                                        <tr>
+                                            <td colspan="2" class="text-center">{movie.actor1}</td>
                                         </tr>
                                         <tr>
-                                            <td></td>
-                                            <td>---</td>
+                                            <td colspan="2" class="text-center">{movie.actor2}</td>
                                         </tr>
                                         <tr>
-                                            <td></td>
-                                            <td>---</td>
+                                            <td colspan="2" class="text-center">{movie.actor3}</td>
                                         </tr>
                                     </tbody>
                                 </table>
