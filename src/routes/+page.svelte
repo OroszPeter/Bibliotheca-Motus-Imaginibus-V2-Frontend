@@ -2,16 +2,39 @@
   import { onMount } from 'svelte';
 
   let movies = [];
+  let ratings = [];
 
-  // API hívás a filmek lekérésére
+  // API hívás a filmek és értékelések lekérésére
   onMount(async () => {
-    const response = await fetch('https://localhost:7214/api/Movie');
-    const data = await response.json();
+    // Filmek lekérése
+    const moviesResponse = await fetch('https://localhost:7214/api/Movie');
+    movies = await moviesResponse.json();
+
+    // Értékelések lekérése
+    const ratingsResponse = await fetch('https://localhost:7214/api/Ratings');
+    ratings = await ratingsResponse.json();
 
     // A legújabb négy film kiválasztása
-    movies = data
+    movies = movies
       .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)) // addedAt alapján csökkenő sorrendbe rendezés
       .slice(0, 4); // Csak az első 4 filmet tartjuk meg
+    // Fetch images for each movie
+    await Promise.all(
+          movies.map(async (movie) => {
+            try {
+              movie.image = `https://localhost:7214/api/Movie/${movie.id}/kep`;
+            } catch (error) {
+              console.error(`Error loading image for movie ${movie.title}:`, error);
+            }
+          })
+        );
+
+    // Az értékelés átlagának kiszámítása minden filmhez
+    movies.forEach(movie => {
+      const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
+      const averageRating = movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length || 0; // Átlag kiszámítása
+      movie.averageRating = averageRating.toFixed(1); // Az átlag egy tizedesjegy pontossággal
+    });
   });
 </script>
 
@@ -23,15 +46,15 @@
         <div class="col-md-3 mb-4">
           <div class="card">
             <!-- Link a képhez -->
-            <a href="https://www.google.com/search?q=ov%C3%A1lis&oq=ov%C3%A1lis&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBCDE1NjhqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8" class="image-link">
+            <a href={`/movies/${movie.id}`} class="image-link">
               <div class="image-container">
-                <img src="https://placehold.co/400x600" class="card-img-top" alt={movie.title} />
-                <div class="badge">5.0</div> <!-- Sárga ovális -->
+                <img src={movie.image} class="card-img-top" alt={movie.title} />
+                <div class="badge">{movie.averageRating}</div> <!-- Átlagértékelés a sárga oválisban -->
               </div>
             </a>
             <div class="card-body">
               <h5 class="card-title">{movie.title}</h5>
-              <small class="text-muted">{movie.genre}</small>
+              <small class="text-muted">{movie.genre}</small> <!-- A leírás helyett genre jelenik meg -->
             </div>
           </div>
         </div>
@@ -88,6 +111,10 @@
     height: 20px;
     border-radius: 50px; /* Ovális forma */
     z-index: 5; /* A badge biztosan a kép előtt legyen */
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 20px;
   }
 
   /* Kártya tartalmának illesztése */
