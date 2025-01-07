@@ -1,32 +1,45 @@
 <script>
   import { onMount } from 'svelte';
-  import { API_Url } from '../../store.js'
+  import { API_Url } from '../../store.js';
 
   let title = '';
   let director = '';
+  let description = '';
+  let actor1 = '';
+  let actor2 = '';
+  let actor3 = '';
   let releasedDate = '';
   let genre = '';
   let length = 0;
+  let isSeries = false; // Checkbox beállítása
+  let numberOfSeasons = 0;
+  let numberOfEpisodes = 0;
   let fileInput;
-  let showAlert = false;  // A zöld ablak megjelenítéséhez
-  let alertMessage = 'Film sikeresen létrehozva!';  // Üzenet a sikeres film létrehozásáról
-  let filmId = null;  // Itt tároljuk az éppen létrehozott film id-ját
+  let showAlert = false;
+  let alertMessage = 'Film sikeresen létrehozva!';
+  let filmId = null;
 
-  // Film létrehozása
   async function createMovie() {
     const movieData = {
-      id: 0, // Az id majd a válaszból érkezik
+      id: 0,
       title,
-      director,
-      releasedDate: releasedDate ? new Date(releasedDate).toISOString() : "",  // Formázd ISO formátumra
       genre,
-      length
+      director,
+      description,
+      actor1,
+      actor2,
+      actor3,
+      releasedDate: releasedDate ? new Date(releasedDate).toISOString() : "",
+      addedAt: new Date().toISOString(), // Automatikus hozzáadási idő
+      length,
+      isSeries,
+      numberOfSeasons: isSeries ? numberOfSeasons : 0,
+      numberOfEpisodes: isSeries ? numberOfEpisodes : 0
     };
 
     console.log("POST kérés a film létrehozásához:", movieData);
 
     try {
-      // POST kérés a film létrehozásához
       const response = await fetch(`${API_Url}Movie`, {
         method: 'POST',
         headers: {
@@ -41,37 +54,33 @@
         return;
       }
 
-      const data = await response.text();  // Mivel id-t ad vissza a szerver, szöveges válaszként kérjük
-      filmId = parseInt(data, 10); // A szöveges választ számra konvertáljuk
+      const data = await response.text();
+      filmId = parseInt(data, 10);
 
       console.log("Film létrehozva, id:", filmId);
 
-      // Ha van filmId és fájl, akkor próbáljuk feltölteni a képet
       if (filmId && fileInput.files.length > 0) {
         await uploadImage(filmId);
       }
 
-      // Sikeres film létrehozás után jelenítsük meg a zöld ablakot
       showAlert = true;
       setTimeout(() => {
         showAlert = false;
-        // Átirányítás a létrejött film oldalára
         window.location.href = `/movies/${filmId}`;
-      }, 3000); // 3 másodperc múlva eltűnik, és átirányít
+      }, 3000);
 
     } catch (error) {
       console.error('Hiba a film létrehozásakor:', error);
     }
   }
 
-  // Kép feltöltésének funkciója
   async function uploadImage(filmId) {
     if (!fileInput || !fileInput.files.length) {
       console.error("Nincs fájl kiválasztva!");
       return;
     }
 
-    const file = fileInput.files[0]; // Az első fájl kiválasztása
+    const file = fileInput.files[0];
     const formData = new FormData();
     formData.append("file", file);
 
@@ -99,16 +108,15 @@
 <main>
   <div class="container py-5 pt-5 w-75">
     {#if showAlert}
-  <div class="alert alert-success">
-    {alertMessage}
-  </div>
-{/if}
+      <div class="alert alert-success">
+        {alertMessage}
+      </div>
+    {/if}
     <table class="pt-5">
       <tbody>
         <tr>
           <td rowspan="2">
             <div class="picture">
-              <!-- Fájl input mező -->
               <input type="file" bind:this={fileInput} />
             </div>
           </td>
@@ -118,14 +126,16 @@
                 <input type="text" placeholder="Cím" bind:value={title} />
               </h2>
               <p><strong><input type="text" placeholder="Műfaj" bind:value={genre} /></strong></p>
-              <input type="checkbox" placeholder="Sorozat?" style="display: inline;" />
+              <input type="checkbox" bind:checked={isSeries} />
               <p style="display: inline;">Sorozat?</p><br />
-              <input type="number" placeholder="Évadok" /><br />
-              <input type="number" placeholder="Epizódok" /><br />
+              {#if isSeries}
+                <input type="number" placeholder="Évadok" bind:value={numberOfSeasons} /><br />
+                <input type="number" placeholder="Epizódok" bind:value={numberOfEpisodes} /><br />
+              {/if}
               <input type="date" placeholder="Megjelenési idő" bind:value={releasedDate} /><br />
               <input type="number" placeholder="Hossz percben" bind:value={length} />
               <p>
-                <textarea placeholder="Leírás" rows="10" cols="50"></textarea>
+                <textarea placeholder="Leírás" rows="10" cols="50" bind:value={description}></textarea>
               </p>
             </div>
           </td>
@@ -141,19 +151,19 @@
                 <tbody>
                   <tr>
                     <td>Rendező</td>
-                    <td><input type="text" placeholder="Műfaj" bind:value={director} /></td>
+                    <td><input type="text" placeholder="Rendező" bind:value={director} /></td>
                   </tr>
                   <tr>
                     <td>Színész 1</td>
-                    <td><input type="text" placeholder="Színész" /></td>
+                    <td><input type="text" placeholder="Színész" bind:value={actor1} /></td>
                   </tr>
                   <tr>
                     <td>Színész 2</td>
-                    <td><input type="text" placeholder="Színész" /></td>
+                    <td><input type="text" placeholder="Színész" bind:value={actor2} /></td>
                   </tr>
                   <tr>
                     <td>Színész 3</td>
-                    <td><input type="text" placeholder="Színész" /></td>
+                    <td><input type="text" placeholder="Színész" bind:value={actor3} /></td>
                   </tr>
                 </tbody>
               </table>
