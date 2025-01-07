@@ -139,7 +139,7 @@
                         </form>
                     {/if}
 
-                    <!-- Visszajelzés -->
+                    <!-- Visszajelzés  -->
                     {#if feedbackMessage}
                         <div class="alert alert-info mt-3 text-dark">
                             {feedbackMessage}
