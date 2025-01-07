@@ -1,7 +1,7 @@
 <script>
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import { authToken, userStore } from '../../../store.js';
+    import { authToken, userStore, API_Url } from '../../../store.js';
 
     let { movie, movieRatings, averageRating } = $page.data;
     let imageUrl = '';
@@ -35,10 +35,40 @@
         toast = { message, type, visible: true };
         setTimeout(() => (toast.visible = false), 3000);
     }
+    async function deleteMovie(id) {
+        const token = getStoreValue(authToken)?.token;
+
+        if (!token) {
+            showToast('Hiba: Bejelentkezés szükséges a törléshez.', 'error');
+            return;
+        }
+
+        // Megerősítés alert
+        const confirmed = confirm('Biztosan törölni szeretnéd ezt a filmet?');
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`${API_Url}Movie/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Nem sikerült a film törlése.');
+
+            showToast('Film sikeresen törölve!', 'success');
+            window.location.href = "/";
+            // További műveletek, pl. navigálás a főoldalra vagy a lista frissítése
+        } catch (error) {
+            console.error('Hiba a film törlésekor:', error);
+            showToast('Nem sikerült a film törlése.', 'error');
+        }
+    }
 
     async function fetchUsernames() {
         try {
-            const response = await fetch('https://localhost:7214/api/Users');
+            const response = await fetch(`${API_Url}Users`);
             if (!response.ok) throw new Error('Nem sikerült a felhasználók betöltése.');
 
             const userData = await response.json();
@@ -63,7 +93,7 @@
         const newRating = { movieId: movie.id, ratingNumber: rating, userId, comment };
 
         try {
-            const response = await fetch('https://localhost:7214/api/Ratings', {
+            const response = await fetch(`${API_Url}Ratings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,7 +125,7 @@
         }
 
         try {
-            const response = await fetch(`https://localhost:7214/api/Ratings/${id}`, {
+            const response = await fetch(`${API_Url}Ratings/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -117,7 +147,7 @@
             await fetchUsernames();
             if (movie) {
                 const movieId = movie.id;
-                imageUrl = `https://localhost:7214/api/Movie/${movieId}/kep`;
+                imageUrl = `${API_Url}Movie/${movieId}/kep`;
 
                 const response = await fetch(imageUrl);
                 if (!response.ok) throw new Error('Kép nem érhető el');
@@ -154,7 +184,9 @@
                             <div class="content">
                                 <h2>
                                     {movie.title}
-                                    <button class="btn btn-primary btn-sm ms-2">+</button>
+                                    <button class="btn btn-primary btn-sm ms-2" title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button>
+                                    <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)}><i class="bi bi-trash" title="Törlés"></i></button>
+                                    <button class="btn btn-success btn-sm" title="Szerkesztés"><i class="bi bi-pencil"></i></button>
                                 </h2>
                                 <p><strong>{movie.genre}</strong></p>
                                 <small>{averageRating.toFixed(1)} &#9733;</small>
@@ -171,17 +203,20 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td colspan="2" class="text-center">{movie.director}</td>
-                                        </tr>
-                                        <tr><td colspan="2" class="text-center"><strong>Színészek</strong></td></tr>
-                                        <tr>
-                                            <td colspan="2" class="text-center">{movie.actor1}</td>
+                                            <td>Rendezte</td>
+                                            <td>{movie.director}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2" class="text-center">{movie.actor2}</td>
+                                            <td></td>
+                                            <td>{movie.actor1}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2" class="text-center">{movie.actor3}</td>
+                                            <td>Szereplők</td>
+                                            <td>{movie.actor2}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>{movie.actor3}</td>
                                         </tr>
                                     </tbody>
                                 </table>

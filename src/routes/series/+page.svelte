@@ -82,6 +82,7 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       background-color: #333333; /* Eredeti háttérszín */
       color: white; /* Fehér szín a kártya szövegeinek */
+      border: 1px solid red;
     }
   
     .card:hover {

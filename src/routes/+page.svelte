@@ -1,43 +1,58 @@
 <script>
   import { onMount } from 'svelte';
+  import { API_Url } from '../store.js';
 
   let movies = [];
   let ratings = [];
+  let isLoading = true;
 
   // API hívás a filmek és értékelések lekérésére
   onMount(async () => {
-    // Filmek lekérése
-    const moviesResponse = await fetch('https://localhost:7214/api/Movie');
+  try {
+    // Filmek és értékelések betöltése
+    const moviesResponse = await fetch(`${API_Url}Movie`);
+    if (!moviesResponse.ok) throw new Error('Hiba a filmek lekérésekor');
     movies = await moviesResponse.json();
 
-    // Értékelések lekérése
-    const ratingsResponse = await fetch('https://localhost:7214/api/Ratings');
+    const ratingsResponse = await fetch(`${API_Url}Ratings`);
+    if (!ratingsResponse.ok) throw new Error('Hiba az értékelések lekérésekor');
     ratings = await ratingsResponse.json();
 
-    // A legújabb négy film kiválasztása
+    // Csak a 4 legfrissebb film kiválasztása az addedAt alapján
     movies = movies
-      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)) // addedAt alapján csökkenő sorrendbe rendezés
-      .slice(0, 4); // Csak az első 4 filmet tartjuk meg
-    // Fetch images for each movie
-    await Promise.all(
-          movies.map(async (movie) => {
-            try {
-              movie.image = `https://localhost:7214/api/Movie/${movie.id}/kep`;
-            } catch (error) {
-              console.error(`Error loading image for movie ${movie.title}:`, error);
-            }
-          })
-        );
+      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)) // Rendezés csökkenő sorrendbe
+      .slice(0, 4); // Az első 4 film kiválasztása
 
-    // Az értékelés átlagának kiszámítása minden filmhez
+    // Átlag kiszámítása és hozzáadása minden filmhez
     movies.forEach(movie => {
       const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
-      const averageRating = movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length || 0; // Átlag kiszámítása
-      movie.averageRating = averageRating.toFixed(1); // Az átlag egy tizedesjegy pontossággal
+      const averageRating = movieRatings.length
+        ? movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length
+        : 0;
+      movie.averageRating = averageRating.toFixed(1);
     });
-  });
-</script>
 
+    // Képek betöltése
+    await Promise.all(
+      movies.map(async (movie) => {
+        try {
+          movie.image = `${API_Url}Movie/${movie.id}/kep`;
+        } catch {
+          movie.image = 'https://placehold.co/400x600';
+        }
+      })
+    );
+
+    isLoading = false; // Betöltés vége
+  } catch (error) {
+    console.error('Hiba:', error);
+  }
+});
+</script>
+{#if isLoading}
+<div class="spinner-grow" role="status">
+</div>
+{:else}
 <div class="content mt-5">
   <div class="container mt-4">
     <h2 class="mb-5">Újdonságok</h2>
@@ -62,8 +77,17 @@
     </div>
   </div>
 </div>
+{/if}
 
 <style>
+  .spinner-grow{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+  }
+  
   .content {
     margin-left: 300px; /* Sidebar szélességének megfelelő eltolás */
     padding: 20px; /* Extra belső tér a tartalom körül */
@@ -102,20 +126,20 @@
 
   /* Sárga ovális elem a kép felső részén */
   .badge {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffc107; /* Sárga szín */
-    width: 50px;
-    height: 20px;
-    border-radius: 50px; /* Ovális forma */
-    z-index: 5; /* A badge biztosan a kép előtt legyen */
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    line-height: 20px;
-  }
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffc107;
+  width: 50px;
+  height: 20px;
+  border-radius: 50px;
+  z-index: 5;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 20px;
+}
 
   /* Kártya tartalmának illesztése */
   .card-body {

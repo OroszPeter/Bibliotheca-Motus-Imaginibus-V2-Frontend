@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import https from 'https';
+import { API_Url } from '../../../store.js';
 
 export async function load({ params }) {
     const { id } = params;
@@ -7,13 +8,13 @@ export async function load({ params }) {
 
     try {
         // Film adatok lekérése
-        const movieResponse = await fetch(`https://localhost:7214/api/Movie/${id}`, { agent });
+        const movieResponse = await fetch(`${API_Url}Movie/${id}`, { agent });
         if (!movieResponse.ok) throw new Error('Failed to fetch movie');
 
         const movie = await movieResponse.json();
 
         // Értékelések lekérése
-        const ratingsResponse = await fetch('https://localhost:7214/api/Ratings', { agent });
+        const ratingsResponse = await fetch(`${API_Url}Ratings`, { agent });
         if (!ratingsResponse.ok) throw new Error('Failed to fetch ratings');
 
         const allRatings = await ratingsResponse.json();

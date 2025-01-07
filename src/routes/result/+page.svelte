@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { API_Url } from '../../store.js';
 
   let searchQuery = '';
   let movies = [];
@@ -12,7 +13,7 @@
 
   if (searchQuery) {
     // Fetch movies based on search query
-    const response = await fetch(`https://localhost:7214/api/Movie/search?query=${searchQuery}`);
+    const response = await fetch(`${API_Url}Movie/search?query=${searchQuery}`);
     if (response.ok) {
       const data = await response.json();
       if (data.length === 0) {
@@ -32,7 +33,7 @@
         await Promise.all(
           movies.map(async (movie) => {
             try {
-              movie.image = `https://localhost:7214/api/Movie/${movie.id}/kep`;
+              movie.image = `${API_Url}Movie/${movie.id}/kep`;
             } catch (error) {
               console.error(`Error loading image for movie ${movie.title}:`, error);
             }
@@ -40,7 +41,7 @@
         );
 
         // Fetch ratings
-        const ratingsResponse = await fetch('https://localhost:7214/api/Ratings');
+        const ratingsResponse = await fetch(`${API_Url}Ratings`);
         if (ratingsResponse.ok) {
           ratings = await ratingsResponse.json();
 

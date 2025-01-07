@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { API_Url } from '../../store.js'
 
   let title = '';
   let director = '';
@@ -26,7 +27,7 @@
 
     try {
       // POST kérés a film létrehozásához
-      const response = await fetch('https://localhost:7214/api/Movie', {
+      const response = await fetch(`${API_Url}Movie`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -77,7 +78,7 @@
     console.log("PUT kérés a kép feltöltéséhez, filmId:", filmId);
 
     try {
-      const response = await fetch(`https://localhost:7214/api/Movie/${filmId}/kep`, {
+      const response = await fetch(`${API_Url}Movie/${filmId}/kep`, {
         method: 'PUT',
         body: formData
       });

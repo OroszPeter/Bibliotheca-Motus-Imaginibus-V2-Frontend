@@ -13,15 +13,15 @@
 
   // Dinamikusan frissülő menüelemek
   $: menuItems = [
-      { name: "Újdonságok", link: "/" },
-      { name: "Filmek", link: "/movies" },
-      { name: "Sorozatok", link: "/series" },
-      { name: "Watchlist", link: "/watchlist" },
-      { name: "Új tartalom hozzáadása", link: "/add-movie" },
-      ...(isUserLoggedIn
-          ? [{ name: "Kijelentkezés", link: "#logout" }]
-          : [{ name: "Bejelentkezés", link: "/login" }]),
-  ];
+  { name: `Újdonságok`, link: "/", icon: "bi-house" },
+  { name: "Filmek", link: "/movies", icon: "bi-film" },
+  { name: "Sorozatok", link: "/series", icon: "bi-collection-play" },
+  { name: "Watchlist", link: "/watchlist", icon: "bi-bookmark" },
+  { name: "Új tartalom hozzáadása", link: "/add-movie", icon: "bi-plus-circle" },
+  ...(isUserLoggedIn
+    ? [{ name: "Kijelentkezés", link: "#logout", icon: "bi-box-arrow-right" }]
+    : [{ name: "Bejelentkezés", link: "/login", icon: "bi-box-arrow-in-right" }]),
+];
 
   function handleLogout() {
       localStorage.removeItem('authToken');
@@ -69,22 +69,22 @@
 
   <!-- Sidebar -->
   <div class="sidebar bg-dark text-white pt-1">
-      <ul class="list-unstyled">
-          {#each menuItems as item, i}
-              <li
-                  class="py-2 px-3 sidebar-item {i === 0 ? 'first-item' : ''}"
-                  on:click={item.link === "#logout" ? handleLogout : null}
-              >
-                  <a
-                      class="text-white text-decoration-none d-flex justify-content-between align-items-center"
-                      href={item.link}
-                  >
-                      {item.name}
-                      <span class="arrow"><i class="bi bi-arrow-right"></i></span>
-                  </a>
-              </li>
-          {/each}
-      </ul>
+    <ul class="list-unstyled">
+      {#each menuItems as item, i}
+        <li
+          class="py-2 px-3 sidebar-item {i === 0 ? 'first-item' : ''}"
+          on:click={item.link === "#logout" ? handleLogout : null}
+        >
+          <a
+            class="text-white text-decoration-none"
+            href={item.link}
+          >
+            <i class={`bi ${item.icon}`}></i>
+            {item.name}
+          </a>
+        </li>
+      {/each}
+    </ul>
   </div>
 </div>
   
@@ -207,6 +207,15 @@
     input{
       color: white;
     }
+    .sidebar-item a {
+  display: flex; /* Ikon és szöveg egymás mellett */
+  align-items: center; /* Vertikálisan középre igazítás */
+  text-align: left; /* Szöveg balra igazítása */
+}
+
+.sidebar-item i {
+  margin-right: 10px; /* Térköz az ikon és a szöveg között */
+}
   </style>
   
   

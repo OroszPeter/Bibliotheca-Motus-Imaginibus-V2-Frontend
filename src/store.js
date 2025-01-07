@@ -48,3 +48,5 @@ authToken.subscribe((value) => {
         }
     }
 });
+
+export let API_Url = "https://bmiwebapi.tryasp.net/api/";

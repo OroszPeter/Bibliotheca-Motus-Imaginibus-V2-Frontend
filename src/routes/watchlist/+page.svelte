@@ -105,9 +105,8 @@
     }
   
     .wrapper {
-      display: flex;
-      max-width: 1180px;
       position: relative;
+      overflow-x: hidden;
     }
   
     .wrapper i {
@@ -124,6 +123,7 @@
       border-radius: 50%;
       transform: translateY(-50%);
       transition: transform 0.1s linear;
+      z-index: 100;
     }
   
     .wrapper i:active {

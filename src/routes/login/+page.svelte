@@ -1,6 +1,6 @@
 <script>
     import { slide } from 'svelte/transition';
-    import { userStore, isLoggedIn, authToken } from '../../store.js';
+    import { userStore, isLoggedIn, authToken, API_Url } from '../../store.js';
 
     let selectedForm = 'login';
 
@@ -20,7 +20,7 @@
 
     async function handleLogin() {
         try {
-            const response = await fetch('https://localhost:7214/api/Account/login', {
+            const response = await fetch(`${API_Url}Account/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -40,7 +40,7 @@
             authToken.set({ token });
 
             // Felhasználói adatok lekérése
-            const userResponse = await fetch('https://localhost:7214/api/Account/me', {
+            const userResponse = await fetch(`${API_Url}Account/me`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -85,33 +85,34 @@
         }
     }
     async function handleRegister() {
-        try {
-            const response = await fetch('https://localhost:7214/api/Account/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(registerData)
-            });
+    try {
+        const response = await fetch(`${API_Url}Account/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registerData)
+        });
 
-            if (!response.ok) {
-                throw new Error('Regisztrációs hiba');
-            }
-
-            const message = await response.text();
-            alert(message);
-
-            // Automatikus bejelentkezés regisztráció után
-            loginData = {
-                userName: registerData.email,
-                password: registerData.password
-            };
-            await handleLogin(); // Regisztráció után automatikusan bejelentkezés
-        } catch (error) {
-            console.error('Regisztrációs hiba:', error);
-            alert('Sikertelen regisztráció');
+        if (!response.ok) {
+            throw new Error('Regisztrációs hiba');
         }
+
+        const message = await response.text();
+        alert(message);
+
+        // Automatikus bejelentkezés regisztráció után
+        const usernameFromEmail = registerData.email.split('@')[0]; // Az e-mail cím "@" előtti része
+        loginData = {
+            userName: usernameFromEmail,
+            password: registerData.password
+        };
+        await handleLogin(); // Regisztráció után automatikus bejelentkezés
+    } catch (error) {
+        console.error('Regisztrációs hiba:', error);
+        alert('Sikertelen regisztráció');
     }
+}
 </script>
 
 
@@ -123,7 +124,7 @@
                     <!-- Regisztrációs Form -->
                     {#if selectedForm === 'register'}
                         <div class="form-icon form-left" transition:slide>
-                            <i class="bi bi-person-circle"></i>
+                            <i class="bi bi-person-fill-add"></i>
                             <span class="signup">
                                 <a href="#" on:click|preventDefault={() => selectedForm = 'login'}>
                                     Már van profilod? Bejelentkezés
