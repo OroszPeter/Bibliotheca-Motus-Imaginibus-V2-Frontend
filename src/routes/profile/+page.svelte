@@ -1,38 +1,88 @@
 <script>
     import { slide } from 'svelte/transition';
-    import { userStore, isLoggedIn, authToken, API_Url } from '../../store.js';
+    import { userStore, authToken, API_Url } from '../../store.js';
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
 
     let selectedForm = 'login';
- // Felhasználói adatok figyelése
-    let isUserLoggedIn;
-    $: isUserLoggedIn = $isLoggedIn;
+
+    // Felhasználói adatok figyelése
     $: userName = $userStore.userName || '';
     $: email = $userStore.email || '';
     $: firstName = $userStore.firstName || '';
     $: lastName = $userStore.lastName || '';
+    $: token = $authToken.token;  // Token
 
-    // Az authToken store-ból kinyerjük a token-t
-    let token = $authToken.token;  // Itt már az authToken store értékét használjuk
+    let newUsername = '';
+    let newEmail = '';
+    let oldPassword = '';
+    let newPassword = '';
+    let feedbackMessage = ''; // Dinamikus visszajelzés tárolása
 
-    onMount(() => {
-        if (browser) {
-            // Ha van token a localStorage-ban, beállítjuk a store értékét
-            const authTokenFromStorage = localStorage.getItem("authToken");
-            if (authTokenFromStorage) {
-                const parsedToken = JSON.parse(authTokenFromStorage);
-                token = parsedToken.token;
-                console.log('Token sikeresen betöltve:', token);
+    // PUT kérés küldése API végpontra
+    async function updateUserData(endpoint, payload) {
+        try {
+            const response = await fetch(`${API_Url}${endpoint}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.text(); // Szöveges választ kapunk
+                feedbackMessage = data; // Üzenet tárolása
+                return true; // Sikeres módosítás
             } else {
-                console.log('Token nem található a localStorage-ban');
+                const errorData = await response.json();
+                feedbackMessage = `Hiba történt: ${errorData.message || 'Ismeretlen hiba'}`;
+                return false; // Sikertelen módosítás
+            }
+        } catch (error) {
+            feedbackMessage = 'Hálózati hiba történt.';
+            console.error('Hálózati hiba:', error);
+            return false; // Hiba történt
+        }
+    }
+
+    // Adatok módosítása
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        feedbackMessage = ''; // Üzenet törlése az új próbálkozás előtt
+
+        let isUpdated = false;
+
+        if (newUsername) {
+            const success = await updateUserData('Account/update-username', { newUsername });
+            if (success) {
+                userStore.update((user) => ({ ...user, userName: newUsername }));
+                isUpdated = true;
             }
         }
-    });
 
+        if (newEmail) {
+            const success = await updateUserData('Account/update-email', { newEmail });
+            if (success) {
+                userStore.update((user) => ({ ...user, email: newEmail }));
+                isUpdated = true;
+            }
+        }
 
+        if (oldPassword && newPassword) {
+            const success = await updateUserData('Account/password', { oldPassword, newPassword });
+            if (success) {
+                isUpdated = true;
+            }
+        }
+
+        if (isUpdated) {
+            feedbackMessage = 'Adatok sikeresen frissítve.';
+        }
+    }
 </script>
-
 
 <div class="form-bg">
     <div class="container">
@@ -49,25 +99,25 @@
                                 </a>
                             </span>
                         </div>
-                        <form class="form-horizontal form-left" transition:slide>
+                        <form class="form-horizontal form-left" transition:slide on:submit={handleSubmit}>
                             <h3 class="title">Adatok módosítása</h3>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-person-lines-fill"></i></span>
-                                <input class="form-control" type="text" placeholder="Felhasználónév">
+                                <input class="form-control" type="text" placeholder="Felhasználónév" bind:value={newUsername}>
                             </div>
                             <div class="form-group">
-                                <span class="input-icon"><i class="bi bi-envelope-fill"></span>
-                                <input class="form-control" type="text" placeholder="E-mail cím">
+                                <span class="input-icon"><i class="bi bi-envelope-fill"></i></span>
+                                <input class="form-control" type="email" placeholder="E-mail cím" bind:value={newEmail}>
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-unlock-fill"></i></span>
-                                <input class="form-control" type="password" placeholder="Jelszó">
+                                <input class="form-control" type="password" placeholder="Régi jelszó" bind:value={oldPassword}>
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-lock-fill"></i></span>
-                                <input class="form-control" type="password" placeholder="Jelszó újra">
+                                <input class="form-control" type="password" placeholder="Új jelszó" bind:value={newPassword}>
                             </div>
-                            <button class="btn signin bg-danger">Módosít</button>
+                            <button class="btn signin bg-danger" type="submit">Módosít</button>
                         </form>
                     {/if}
 
@@ -83,12 +133,17 @@
                         </div>
                         <form class="form-horizontal form-right" transition:slide>
                             <h3 class="title">{lastName} {firstName}</h3>
-                            <h5>Felhasználónév: {userName}</h5>
-                            <h5>Email: {email}</h5>
+                            <h5><b>Felhasználónév:</b> {userName}</h5>
+                            <h5><b>Email:</b> {email}</h5>
                             <button class="btn btn-danger mt-5">Profil törlése</button>
-                            
-                            
                         </form>
+                    {/if}
+
+                    <!-- Visszajelzés -->
+                    {#if feedbackMessage}
+                        <div class="alert alert-info mt-3 text-dark">
+                            {feedbackMessage}
+                        </div>
                     {/if}
                 </div>
             </div>
@@ -96,7 +151,12 @@
     </div>
 </div>
 
+
+
 <style>
+    h5{
+        font-size: 20px;
+    }
     p{
         color: black;
         z-index: 100;

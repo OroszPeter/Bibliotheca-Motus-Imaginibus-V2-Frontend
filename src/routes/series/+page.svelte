@@ -1,144 +1,191 @@
 <script>
-    let movies = [
-      { 
-        title: "Terminátor", 
-        description: "Akció/sci-fi", 
-        image: "https://placehold.co/400x600" 
-      },
-      { 
-        title: "Eredet", 
-        description: "Akció/sci-fi", 
-        image: "https://placehold.co/400x600" 
-      },
-      { 
-        title: "Mátrix", 
-        description: "Akció/sci-fi", 
-        image: "https://placehold.co/400x600" 
-      },
-      { 
-        title: "Keresztapa", 
-        description: "Krimi", 
-        image: "https://placehold.co/400x600" 
-      },
-    ];
-  </script>
-  
-  <div class="content mt-5">
-    <div class="container mt-4">
-      <h2 class="mb-5">Sorozatok</h2>
-      <h3>Akció</h3>
+  import { onMount } from 'svelte';
+  import { API_Url } from '../../store.js';
+
+  let movies = []; // Filmek tárolása
+  let ratings = []; // Értékelések tárolása
+  let categorizedMovies = {}; // Filmek kategorizálása műfajok szerint
+  let isLoading = true;
+  let selectedCategory = 'Összes';
+
+  // API hívás a filmek lekéréséhez
+  onMount(async () => {
+  try {
+    const movieResponse = await fetch(`${API_Url}Movie`);
+    if (!movieResponse.ok) throw new Error('Hiba a filmek lekérésekor');
+    movies = (await movieResponse.json()).filter(movie => movie.isSeries); // Csak a filmek
+
+    const ratingResponse = await fetch(`${API_Url}Ratings`);
+    if (!ratingResponse.ok) throw new Error('Hiba az értékelések lekérésekor');
+    ratings = await ratingResponse.json();
+
+    categorizedMovies = movies.reduce((acc, movie) => {
+      if (!acc[movie.genre]) acc[movie.genre] = [];
+      acc[movie.genre].push(movie);
+      return acc;
+    }, {});
+
+    movies.forEach(movie => {
+      const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
+      const averageRating = movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length;
+      movie.averageRating = averageRating || 0;
+    });
+
+    await Promise.all(
+      movies.map(async (movie) => {
+        try {
+          movie.imageUrl = `${API_Url}Movie/${movie.id}/kep`;
+        } catch (error) {
+          console.error(`Hiba a(z) ${movie.title} képének betöltésekor:`, error);
+          movie.imageUrl = 'https://placehold.co/400x600';
+        }
+      })
+    );
+    isLoading = false;
+  } catch (error) {
+    console.error('Hiba a filmek vagy értékelések betöltésekor:', error);
+  }
+});
+
+  function filterCategory(category) {
+    selectedCategory = category;
+  }
+</script>
+
+<style>
+  .content {
+    margin-left: 300px;
+    padding: 20px;
+    color: white;
+  }
+
+  .category-button {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 10px 15px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .category-button.active {
+    background-color: #811331;
+    font-weight: bold;
+  }
+
+  .category-button:hover {
+    background-color: #555;
+  }
+
+  .card {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #333333;
+    color: white;
+    border: 5px solid #811331;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffc107;
+    width: 50px;
+    height: 20px;
+    border-radius: 50px;
+    z-index: 1;
+  }
+
+  .card-body {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .card-title {
+    margin-bottom: 5px;
+    color: white;
+  }
+
+  small {
+    font-size: 0.875rem;
+    color: white !important;
+  }
+</style>
+
+{#if isLoading}
+<div class="spinner-grow" role="status"></div>
+{:else}
+<div class="content mt-5">
+  <div class="container mt-4">
+    <h2 class="mb-5">Sorozatok</h2>
+    <h3>Kategóriák</h3>
+    <hr>
+    {#each ['Összes', ...Object.keys(categorizedMovies)] as genre}
+      <button 
+        class="category-button {selectedCategory === genre ? 'active' : ''}"
+        on:click={() => filterCategory(genre)}>
+        {genre}
+      </button>
+    {/each}
+    <hr>
+
+    {#if selectedCategory === 'Összes'}
+      {#each Object.keys(categorizedMovies) as genre}
+        <h4>{genre}</h4>
+        <div class="row">
+          {#each categorizedMovies[genre].slice(0, 4) as movie}
+            <div class="col-md-3 mb-4">
+              <div class="card">
+                <a href={`/movies/${movie.id}`} class="image-link">
+                  <div class="image-container">
+                    <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
+                    <div class="badge">{movie.averageRating.toFixed(1)}</div>
+                  </div>
+                </a>
+
+                <div class="card-body">
+                  <h5 class="card-title">{movie.title}</h5>
+                  <small class="text-muted">{movie.genre}</small>
+                </div>
+              </div>
+            </div>
+          {/each}
+          <button 
+            class="category-button" 
+            on:click={() => filterCategory(genre)}>Összes megjelenítése</button>
+        </div>
+      {/each}
+    {:else}
+      <h4>{selectedCategory}</h4>
       <div class="row">
-        {#each movies as movie}
+        {#each categorizedMovies[selectedCategory] as movie}
           <div class="col-md-3 mb-4">
             <div class="card">
-              <!-- Link a képhez -->
-              <a href="https://www.google.com/search?q=ov%C3%A1lis&oq=ov%C3%A1lis&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBCDE1NjhqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8" class="image-link">
+              <a href={`/movies/${movie.id}`} class="image-link">
                 <div class="image-container">
-                  <img src={movie.image} class="card-img-top" alt={movie.title} />
-                  <div class="badge">5.0</div> <!-- Sárga ovális -->
+                  <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
+                  <div class="badge">{movie.averageRating.toFixed(1)}</div>
                 </div>
               </a>
+
               <div class="card-body">
                 <h5 class="card-title">{movie.title}</h5>
-                <small class="text-muted">{movie.description}</small>
+                <small class="text-muted">{movie.genre}</small>
               </div>
             </div>
           </div>
         {/each}
       </div>
-      <h3>Dráma</h3>
-      <div class="row">
-        {#each movies as movie}
-          <div class="col-md-3 mb-4">
-            <div class="card">
-              <!-- Link a képhez -->
-              <a href="https://www.google.com/search?q=ov%C3%A1lis&oq=ov%C3%A1lis&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBCDE1NjhqMGoxqAIAsAIA&sourceid=chrome&ie=UTF-8" class="image-link">
-                <div class="image-container">
-                  <img src={movie.image} class="card-img-top" alt={movie.title} />
-                  <div class="badge">5.0</div> <!-- Sárga ovális -->
-                </div>
-              </a>
-              <div class="card-body">
-                <h5 class="card-title">{movie.title}</h5>
-                <small class="text-muted">{movie.description}</small>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    </div>
+    {/if}
   </div>
-  
-  <style>
-    .content {
-      margin-left: 300px; /* Sidebar szélességének megfelelő eltolás */
-      padding: 20px; /* Extra belső tér a tartalom körül */
-      color: white; /* Alapértelmezett fehér szín a szövegekhez */
-    }
-  
-    /* Kártya alapstílus */
-    .card {
-      border: none;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      background-color: #333333; /* Eredeti háttérszín */
-      color: white; /* Fehér szín a kártya szövegeinek */
-      border: 1px solid red;
-    }
-  
-    .card:hover {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      transform: translateY(-5px);
-      transition: all 0.3s ease-in-out;
-    }
-  
-    /* Link a képen */
-    .image-link {
-      display: block; /* A link legyen blokkszintű, hogy a teljes képet lefedje */
-      text-decoration: none; /* Link alapértelmezett aláhúzása eltávolítva */
-    }
-  
-    /* A képre vonatkozó stílusok */
-    .image-container {
-      position: relative;
-    }
-  
-    .card-img-top {
-      padding-bottom: 10px; /* A kép és a szöveg közötti távolság csökkentése */
-      margin-bottom: 10px; /* Kis távolság a kép alatt */
-    }
-  
-    /* Sárga ovális elem a kép felső részén */
-    .badge {
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #ffc107; /* Sárga szín */
-      width: 50px;
-      height: 20px;
-      border-radius: 50px; /* Ovális forma */
-      z-index: 5; /* A badge biztosan a kép előtt legyen */
-    }
-  
-    /* Kártya tartalmának illesztése */
-    .card-body {
-      padding-top: 5px; /* Kevesebb padding a tetején */
-      padding-bottom: 5px; /* Kevesebb padding az alján */
-    }
-  
-    .card-title {
-      margin-bottom: 5px; /* A cím és a leírás közötti távolság csökkentése */
-      color: white; /* Cím színének fehérre állítása */
-    }
-  
-    /* Fehér szín a small tag számára */
-    small {
-      font-size: 0.875rem; /* A leírás szöveg méretének csökkentése */
-      color: white !important; /* Biztosítja, hogy a small szöveg fehér legyen */
-    }
-  
-    .card:hover .card-body {
-      background-color: #333333; /* Az alap háttérszín megmarad hover során is */
-    }
-  </style>
-  
+</div>
+{/if}

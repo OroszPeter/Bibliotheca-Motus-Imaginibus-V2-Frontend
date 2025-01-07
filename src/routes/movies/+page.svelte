@@ -10,42 +10,42 @@
 
   // API hívás a filmek lekéréséhez
   onMount(async () => {
-    try {
-      const movieResponse = await fetch(`${API_Url}Movie`);
-      if (!movieResponse.ok) throw new Error('Hiba a filmek lekérésekor');
-      movies = await movieResponse.json();
+  try {
+    const movieResponse = await fetch(`${API_Url}Movie`);
+    if (!movieResponse.ok) throw new Error('Hiba a filmek lekérésekor');
+    movies = (await movieResponse.json()).filter(movie => !movie.isSeries); // Csak a filmek
 
-      const ratingResponse = await fetch(`${API_Url}Ratings`);
-      if (!ratingResponse.ok) throw new Error('Hiba az értékelések lekérésekor');
-      ratings = await ratingResponse.json();
+    const ratingResponse = await fetch(`${API_Url}Ratings`);
+    if (!ratingResponse.ok) throw new Error('Hiba az értékelések lekérésekor');
+    ratings = await ratingResponse.json();
 
-      categorizedMovies = movies.reduce((acc, movie) => {
-        if (!acc[movie.genre]) acc[movie.genre] = [];
-        acc[movie.genre].push(movie);
-        return acc;
-      }, {});
+    categorizedMovies = movies.reduce((acc, movie) => {
+      if (!acc[movie.genre]) acc[movie.genre] = [];
+      acc[movie.genre].push(movie);
+      return acc;
+    }, {});
 
-      movies.forEach(movie => {
-        const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
-        const averageRating = movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length;
-        movie.averageRating = averageRating || 0;
-      });
+    movies.forEach(movie => {
+      const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
+      const averageRating = movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length;
+      movie.averageRating = averageRating || 0;
+    });
 
-      await Promise.all(
-        movies.map(async (movie) => {
-          try {
-            movie.imageUrl = `${API_Url}Movie/${movie.id}/kep`;
-          } catch (error) {
-            console.error(`Hiba a(z) ${movie.title} képének betöltésekor:`, error);
-            movie.imageUrl = 'https://placehold.co/400x600';
-          }
-        })
-      );
-      isLoading = false;
-    } catch (error) {
-      console.error('Hiba a filmek vagy értékelések betöltésekor:', error);
-    }
-  });
+    await Promise.all(
+      movies.map(async (movie) => {
+        try {
+          movie.imageUrl = `${API_Url}Movie/${movie.id}/kep`;
+        } catch (error) {
+          console.error(`Hiba a(z) ${movie.title} képének betöltésekor:`, error);
+          movie.imageUrl = 'https://placehold.co/400x600';
+        }
+      })
+    );
+    isLoading = false;
+  } catch (error) {
+    console.error('Hiba a filmek vagy értékelések betöltésekor:', error);
+  }
+});
 
   function filterCategory(category) {
     selectedCategory = category;
