@@ -6,7 +6,7 @@
   let ratings = [];
   let isLoading = true;
 
-  // API hívás a filmek és értékelések lekérésére
+  // API hívás a filmek és értékelések lekéréséree
   onMount(async () => {
   try {
     // Filmek és értékelések betöltése
