@@ -120,7 +120,7 @@
               <input type="file" bind:this={fileInput} />
             </div>
           </td>
-          <td>
+          <td class="desc">
             <div class="content">
               <h2>
                 <input type="text" placeholder="Cím" bind:value={title} />
@@ -251,6 +251,9 @@
   .star-rating label:hover,
   .star-rating label.selected {
     color: gold;
+  }
+  td input{
+    width: 100%;
   }
 
   .table th,
