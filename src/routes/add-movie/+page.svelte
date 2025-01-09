@@ -120,7 +120,7 @@
               <input type="file" bind:this={fileInput} />
             </div>
           </td>
-          <td class="desc">
+          <td class="desc" style="padding-left:10px; padding-right:10px;">
             <div class="content">
               <h2>
                 <input type="text" placeholder="Cím" bind:value={title} />
@@ -135,7 +135,7 @@
               <input type="date" placeholder="Megjelenési idő" bind:value={releasedDate} /><br />
               <input type="number" placeholder="Hossz percben" bind:value={length} />
               <p>
-                <textarea placeholder="Leírás" rows="10" cols="50" bind:value={description}></textarea>
+                <textarea placeholder="Leírás" rows="10" cols="40" bind:value={description}></textarea>
               </p>
             </div>
           </td>
@@ -221,8 +221,8 @@
 
   .picture {
     border: 1px solid black;
-    width: 400px;
-    height: 700px;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
