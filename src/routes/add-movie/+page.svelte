@@ -32,10 +32,14 @@
       releasedDate: releasedDate ? new Date(releasedDate).toISOString() : "",
       addedAt: new Date().toISOString(), // Automatikus hozzáadási idő
       length,
-      isSeries,
-      numberOfSeasons: isSeries ? numberOfSeasons : 0,
-      numberOfEpisodes: isSeries ? numberOfEpisodes : 0
+      isSeries
     };
+
+    // Ha sorozat, hozzáadjuk az évadok és epizódok számát
+    if (isSeries) {
+      movieData.numberOfSeasons = numberOfSeasons;
+      movieData.numberOfEpisodes = numberOfEpisodes;
+    }
 
     console.log("POST kérés a film létrehozásához:", movieData);
 
@@ -54,11 +58,13 @@
         return;
       }
 
-      const data = await response.text();
-      filmId = parseInt(data, 10);
+      // Az ID-t a válaszból olvassuk ki (ez most számként jön vissza)
+      const data = await response.text();  // Az ID-t szövegként kapjuk
+      filmId = parseInt(data, 10);  // A válaszból számként dolgozzuk fel az ID-t
 
       console.log("Film létrehozva, id:", filmId);
 
+      // Ha sikeres volt a film létrehozása, és van fájl, akkor feltöltjük a képet
       if (filmId && fileInput.files.length > 0) {
         await uploadImage(filmId);
       }
@@ -66,7 +72,7 @@
       showAlert = true;
       setTimeout(() => {
         showAlert = false;
-        window.location.href = `/movies/${filmId}`;
+        window.location.href = `/movies/${filmId}`;  // A film oldalára irányítunk
       }, 3000);
 
     } catch (error) {
@@ -112,6 +118,7 @@
         {alertMessage}
       </div>
     {/if}
+    <h2 class="mt-4">Tartalom hozzáadása</h2>
     <table class="pt-5">
       <tbody>
         <tr>
@@ -126,17 +133,27 @@
                 <input type="text" placeholder="Cím" bind:value={title} />
               </h2>
               <p><strong><input type="text" placeholder="Műfaj" bind:value={genre} /></strong></p>
-              <input type="checkbox" bind:checked={isSeries} />
-              <p style="display: inline;">Sorozat?</p><br />
-              {#if isSeries}
-                <input type="number" placeholder="Évadok" bind:value={numberOfSeasons} /><br />
-                <input type="number" placeholder="Epizódok" bind:value={numberOfEpisodes} /><br />
-              {/if}
               <input type="date" placeholder="Megjelenési idő" bind:value={releasedDate} /><br />
-              <input type="number" placeholder="Hossz percben" bind:value={length} />
+              <p class="input-label">
+                Játékidő (percben):  
+                <input type="number" placeholder="Hossz percben" bind:value={length} />
+              </p>
               <p>
                 <textarea placeholder="Leírás" rows="10" cols="40" bind:value={description}></textarea>
               </p>
+              <input id="isSeries" type="checkbox" bind:checked={isSeries} />
+              {#if isSeries}
+  <p class="input-label">
+    Évadok száma: 
+    <input type="number" placeholder="Évadok száma" bind:value={numberOfSeasons} />
+  </p>
+  <p class="input-label">
+    Epizódok száma: 
+    <input type="number" placeholder="Epizódok száma" bind:value={numberOfEpisodes} />
+  </p>
+{:else}
+  <div style="height: 59px;"></div> <!-- Üres helykitöltés -->
+{/if}
             </div>
           </td>
           <td>
@@ -177,32 +194,49 @@
 </main>
 
 <style>
+  #isSeries{
+    text-align: center;
+    appearance: none;
+    background-color: white;
+  }
+  #isSeries::before{
+    content: "Film";
+  }
+  #isSeries:checked::before{
+    content: "Sorozat";
+  }
+  .input-label {
+  display: flex;
+  align-items: center; /* Középre igazítja a szöveget és az input mezőt */
+  margin-bottom: 10px; /* Kis távolság a mezők között */
+}
   .alert {
-  background-color: #28a745;  /* Zöld háttér */
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
-  position: fixed;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: none;  /* Kezdetben nem látszik */
-}
+    background-color: #28a745;  /* Zöld háttér */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;  /* Kezdetben nem látszik */
+  }
 
-.alert.alert-success {
-  display: block;
-  animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
-}
+  .alert.alert-success {
+    display: block;
+    animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
+  }
 
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { opacity: 0; display: none; }
-}
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+  }
+
   .container {
     margin-left: 300px;
     padding: 20px;
@@ -212,17 +246,17 @@
 
   textarea {
     border-radius: 10px;
+    width: 100%; /* A textarea kitölti a rendelkezésre álló helyet */
   }
 
   table {
     width: 100%;
-    table-layout: fixed;
+    table-layout: fixed; /* Fix táblázat elrendezés */
   }
 
   .picture {
     border: 1px solid black;
     width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -233,6 +267,14 @@
     width: 100%;
     padding: 10px;
     vertical-align: top;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Fix méret a td elemhez */
+  td {
+    vertical-align: top;
+    width: 33%; /* Egyenlő szélesség minden td számára */
   }
 
   .star {
@@ -252,8 +294,9 @@
   .star-rating label.selected {
     color: gold;
   }
-  td input{
-    width: 100%;
+
+  td input {
+    width: 100%; /* Az inputok kitöltik a td teljes szélességét */
   }
 
   .table th,
@@ -273,4 +316,13 @@
     display: flex;
     justify-content: flex-start;
   }
+
+  /* Checkbox stílus */
+  input[type="checkbox"] {
+    margin: 10px 0; /* Térköz a checkbox körül */
+  }
+
+  
+
 </style>
+
