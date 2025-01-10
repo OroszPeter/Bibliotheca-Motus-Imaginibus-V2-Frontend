@@ -41,9 +41,10 @@
         }
       })
     );
-    isLoading = false;
   } catch (error) {
     console.error('Hiba a filmek vagy értékelések betöltésekor:', error);
+  } finally {
+    isLoading = false;
   }
 });
 
@@ -53,6 +54,13 @@
 </script>
 
 <style>
+  .spinner-grow{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+  }
   .content {
     margin-left: 300px;
     padding: 20px;
