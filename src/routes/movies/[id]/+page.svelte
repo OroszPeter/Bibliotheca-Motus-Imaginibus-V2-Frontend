@@ -11,6 +11,8 @@
     let comment = '';
     let toast = { message: '', type: '', visible: false };
     let users = {}; // User ID -> username tárolás
+    let releasedYear = new Date(movie.releasedDate).getFullYear();
+    let isAtWatchlist = false;
 
     // Segédfüggvény a store-értékek szinkron kiolvasására
     function getStoreValue(store) {
@@ -116,6 +118,41 @@
         }
     }
 
+    async function AddToWatchlist() {
+    const addedDate = new Date().toISOString();
+    const token = getStoreValue(authToken)?.token;
+    const userId = getStoreValue(userStore)?.id;
+
+    if (!userId || !token) {
+        showToast('Hiba: Bejelentkezés szükséges a watchlist-hez adáshoz.', 'error');
+        return;
+    }
+
+    const newWatchlist = { movieId: movie.id, userId, addedDate };
+
+    try {
+        const response = await fetch(`${API_Url}Watchlist`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(newWatchlist)
+        });
+
+        if (!response.ok) {
+            const errorMessage = `Hiba: ${response.status} - ${response.statusText}`;
+            throw new Error(errorMessage);
+        }
+
+        showToast('Film sikeresen hozzáadva a watchlisthez!', 'success');
+    } catch (error) {
+        console.error('Hiba a watchlisthez adáskor:', error);
+        showToast('Nem sikerült a watchlisthez adás.', 'error');
+    }
+}
+
+
     async function deleteRating(id) {
         const token = getStoreValue(authToken)?.token;
 
@@ -183,12 +220,16 @@
                         <td class="desc">
                             <div class="content">
                                 <h2>
-                                    {movie.title}
-                                    <button class="btn btn-primary btn-sm ms-2" title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button>
+                                    {movie.title} <small>({releasedYear})</small>
+                                    {#if isAtWatchlist}
+                                    <button class="btn btn-primary btn-sm ms-2" title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark-fill"></i></button><br>
+                                    {:else}
+                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => AddToWatchlist()} title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button><br>
+                                    {/if}
                                     <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)}><i class="bi bi-trash" title="Törlés"></i></button>
                                     <button class="btn btn-success btn-sm" title="Szerkesztés"><i class="bi bi-pencil"></i></button>
                                 </h2>
-                                <p><strong>{movie.genre}</strong></p>
+                                <p><strong>{movie.genre}</strong> - {movie.length}p</p>
                                 <small>{averageRating.toFixed(1)} &#9733;</small>
                                 <p class="description">{movie.description || 'Film leírás nem elérhető.'}</p>
                             </div>
