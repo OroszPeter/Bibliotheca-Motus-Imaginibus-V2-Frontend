@@ -37,6 +37,7 @@
         toast = { message, type, visible: true };
         setTimeout(() => (toast.visible = false), 3000);
     }
+
     async function deleteMovie(id) {
         const token = getStoreValue(authToken)?.token;
 
@@ -61,7 +62,6 @@
 
             showToast('Film sikeresen törölve!', 'success');
             window.location.href = "/";
-            // További műveletek, pl. navigálás a főoldalra vagy a lista frissítése
         } catch (error) {
             console.error('Hiba a film törlésekor:', error);
             showToast('Nem sikerült a film törlése.', 'error');
@@ -82,6 +82,62 @@
             console.error('Hiba a felhasználónevek lekérdezésekor:', error);
         }
     }
+
+    let watchlistItemId = null; // A watchlist elem ID-jának tárolása
+
+async function fetchWatchlist() {
+    const token = getStoreValue(authToken)?.token;
+    const userId = getStoreValue(userStore)?.id;
+
+    if (!token || !userId) {
+        showToast('Hiba: Bejelentkezés szükséges a watchlist ellenőrzéséhez.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_Url}Watchlist`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Nem sikerült a watchlist lekérdezése.');
+
+        const watchlist = await response.json();
+        const item = watchlist.find(item => item.movieId === movie.id && item.userId === userId);
+        isAtWatchlist = !!item;
+        watchlistItemId = item ? item.id : null; // Az elem ID-jának mentése
+    } catch (error) {
+        console.error('Hiba a watchlist lekérdezésekor:', error);
+    }
+}
+
+async function removeFromWatchlist() {
+    const token = getStoreValue(authToken)?.token;
+
+    if (!token || !watchlistItemId) {
+        showToast('Hiba: Bejelentkezés szükséges a törléshez.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_Url}Watchlist/${watchlistItemId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Nem sikerült a film eltávolítása a watchlistből.');
+
+        showToast('Film eltávolítva a watchlistből!', 'success');
+        isAtWatchlist = false;
+        watchlistItemId = null; // Törlés után nullázás
+    } catch (error) {
+        console.error('Hiba a film eltávolításakor:', error);
+        showToast('Nem sikerült a film eltávolítása a watchlistből.', 'error');
+    }
+}
 
     async function submitRating() {
         const token = getStoreValue(authToken)?.token;
@@ -119,38 +175,39 @@
     }
 
     async function AddToWatchlist() {
-    const addedDate = new Date().toISOString();
-    const token = getStoreValue(authToken)?.token;
-    const userId = getStoreValue(userStore)?.id;
+        const addedDate = new Date().toISOString();
+        const token = getStoreValue(authToken)?.token;
+        const userId = getStoreValue(userStore)?.id;
 
-    if (!userId || !token) {
-        showToast('Hiba: Bejelentkezés szükséges a watchlist-hez adáshoz.', 'error');
-        return;
-    }
-
-    const newWatchlist = { movieId: movie.id, userId, addedDate };
-
-    try {
-        const response = await fetch(`${API_Url}Watchlist`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify(newWatchlist)
-        });
-
-        if (!response.ok) {
-            const errorMessage = `Hiba: ${response.status} - ${response.statusText}`;
-            throw new Error(errorMessage);
+        if (!userId || !token) {
+            showToast('Hiba: Bejelentkezés szükséges a watchlist-hez adáshoz.', 'error');
+            return;
         }
 
-        showToast('Film sikeresen hozzáadva a watchlisthez!', 'success');
-    } catch (error) {
-        console.error('Hiba a watchlisthez adáskor:', error);
-        showToast('Nem sikerült a watchlisthez adás.', 'error');
+        const newWatchlist = { movieId: movie.id, userId, addedDate };
+
+        try {
+            const response = await fetch(`${API_Url}Watchlist`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(newWatchlist)
+            });
+
+            if (!response.ok) {
+                const errorMessage = `Hiba: ${response.status} - ${response.statusText}`;
+                throw new Error(errorMessage);
+            }
+
+            showToast('Film sikeresen hozzáadva a watchlisthez!', 'success');
+            isAtWatchlist = true;
+        } catch (error) {
+            console.error('Hiba a watchlisthez adáskor:', error);
+            showToast('Nem sikerült a watchlisthez adás.', 'error');
+        }
     }
-}
 
 
     async function deleteRating(id) {
@@ -172,7 +229,7 @@
             if (!response.ok) throw new Error('Nem sikerült az értékelés törlése.');
 
             movieRatings = movieRatings.filter(rating => rating.id !== id);
-            showToast('Értékelés törölve!', 'error');
+            showToast('Értékelés törölve!', 'success');
         } catch (error) {
             console.error('Hiba az értékelés törlésekor:', error);
             showToast('Nem sikerült az értékelés törlése.', 'error');
@@ -188,6 +245,8 @@
 
                 const response = await fetch(imageUrl);
                 if (!response.ok) throw new Error('Kép nem érhető el');
+
+                await fetchWatchlist();
             } else {
                 imageUrl = 'https://placehold.co/400x600';
             }
@@ -222,9 +281,9 @@
                                 <h2>
                                     {movie.title} <small>({releasedYear})</small>
                                     {#if isAtWatchlist}
-                                    <button class="btn btn-primary btn-sm ms-2" title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark-fill"></i></button><br>
+                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => removeFromWatchlist()} title="Eltávolítás a watchlistből"><i class="bi bi-bookmark-fill"></i></button>
                                     {:else}
-                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => AddToWatchlist()} title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button><br>
+                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => AddToWatchlist()} title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button>
                                     {/if}
                                     <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)}><i class="bi bi-trash" title="Törlés"></i></button>
                                     <button class="btn btn-success btn-sm" title="Szerkesztés"><i class="bi bi-pencil"></i></button>
@@ -317,6 +376,7 @@
         {toast.message}
     </div>
 </main>
+
 
 <style>
     .container {
