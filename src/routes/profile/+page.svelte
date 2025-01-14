@@ -1,6 +1,6 @@
 <script>
     import { slide } from 'svelte/transition';
-    import { userStore, authToken, API_Url } from '../../store.js';
+    import { userStore, authToken, API_Url, isLoggedIn } from '../../store.js';
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
 
@@ -17,7 +17,6 @@
     let newEmail = '';
     let oldPassword = '';
     let newPassword = '';
-    let feedbackMessage = ''; // Dinamikus visszajelzés tárolása
 
     // PUT kérés küldése API végpontra
     async function updateUserData(endpoint, payload) {
@@ -33,15 +32,12 @@
 
             if (response.ok) {
                 const data = await response.text(); // Szöveges választ kapunk
-                feedbackMessage = data; // Üzenet tárolása
                 return true; // Sikeres módosítás
             } else {
                 const errorData = await response.json();
-                feedbackMessage = `Hiba történt: ${errorData.message || 'Ismeretlen hiba'}`;
                 return false; // Sikertelen módosítás
             }
         } catch (error) {
-            feedbackMessage = 'Hálózati hiba történt.';
             console.error('Hálózati hiba:', error);
             return false; // Hiba történt
         }
@@ -50,8 +46,6 @@
     // Adatok módosítása
     async function handleSubmit(event) {
         event.preventDefault();
-
-        feedbackMessage = ''; // Üzenet törlése az új próbálkozás előtt
 
         let isUpdated = false;
 
@@ -93,11 +87,43 @@
             document.body.appendChild(successMessageDiv);
 
             setTimeout(() => {
+                selectedForm = 'userdata';
                 successMessageDiv.remove();
-                window.location.href = "/"; // Átirányítás a főoldalra
             }, 3000);
         }
     }
+    // Profil törlése
+    async function handleDeleteProfile() {
+    if (!confirm('Biztosan törölni szeretnéd a profilodat?')) {
+        return; // Ha a felhasználó nem erősítette meg, kilépünk.
+    }
+
+    try {
+        const response = await fetch(`${API_Url}Account/delete-profile`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const message = await response.text(); // Szöveges válasz feldolgozása
+
+            // Adatok törlése a store-ból és a localStorage-ból
+            userStore.set({});
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userStore');
+
+            // Átirányítás a kezdőlapra vagy bejelentkező oldalra
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+            isLoggedIn.set(false);
+        }
+    } catch (error) {
+        console.error('Hálózati hiba:', error);
+    }
+}
 </script>
 
 <div class="form-bg">
@@ -151,15 +177,8 @@
                             <h3 class="title">{lastName} {firstName}</h3>
                             <h5><b>Felhasználónév:</b> {userName}</h5>
                             <h5><b>Email:</b> {email}</h5>
-                            <button class="btn btn-danger mt-5">Profil törlése</button>
+                            <button class="btn btn-danger mt-5" on:click={handleDeleteProfile}>Profil törlése</button>
                         </form>
-                    {/if}
-
-                    <!-- Visszajelzés  -->
-                    {#if feedbackMessage}
-                        <div class="alert alert-info mt-3 text-dark">
-                            {feedbackMessage}
-                        </div>
                     {/if}
                 </div>
             </div>

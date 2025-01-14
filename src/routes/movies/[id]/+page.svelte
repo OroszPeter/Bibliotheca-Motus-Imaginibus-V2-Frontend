@@ -362,6 +362,12 @@ async function removeFromWatchlist() {
                                     <button class="btn btn-success btn-sm" title="Szerkesztés"><i class="bi bi-pencil"></i></button>
                                 </h2>
                                 <p><strong>{movie.genre}</strong> - {movie.length}p</p>
+                                {#if movie.isSeries}
+                                    {#if movie.numberOfSeasons > 1}
+                                    <p>{movie.numberOfSeasons} évad, {movie.numberOfEpisodes} epizód</p>
+                                    {:else}
+                                    {/if}
+                                {/if}
                                 <small>{averageRating.toFixed(1)} &#9733;</small>
                                 <p class="description">{movie.description || 'Film leírás nem elérhető.'}</p>
                             </div>
