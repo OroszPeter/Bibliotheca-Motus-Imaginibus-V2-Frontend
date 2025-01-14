@@ -4,7 +4,7 @@
     import { onMount } from 'svelte';
     import { browser } from '$app/environment';
 
-    let selectedForm = 'login';
+    let selectedForm = 'userdata';
 
     // Felhasználói adatok figyelése
     $: userName = $userStore.userName || '';
@@ -79,7 +79,23 @@
         }
 
         if (isUpdated) {
-            feedbackMessage = 'Adatok sikeresen frissítve.';
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Adatok sikeresen frissítve!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'green';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                window.location.href = "/"; // Átirányítás a főoldalra
+            }, 3000);
         }
     }
 </script>
@@ -90,11 +106,11 @@
             <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
                 <div class="form-container bg-danger">
                     <!-- Profil szerkesztése Form -->
-                    {#if selectedForm === 'register'}
+                    {#if selectedForm === 'edit'}
                         <div class="form-icon form-left" transition:slide>
                             <i class="bi bi-pencil-fill"></i>
                             <span class="signup">
-                                <a href="#" on:click|preventDefault={() => selectedForm = 'login'}>
+                                <a href="#" on:click|preventDefault={() => selectedForm = 'userdata'}>
                                     Vissza a profil adatokhoz
                                 </a>
                             </span>
@@ -122,11 +138,11 @@
                     {/if}
 
                     <!-- Profil adatok Form -->
-                    {#if selectedForm === 'login'}
+                    {#if selectedForm === 'userdata'}
                         <div class="form-icon form-right" transition:slide>
                             <i class="bi bi-person-circle"></i>
                             <span class="signup">
-                                <a href="#" on:click|preventDefault={() => selectedForm = 'register'}>
+                                <a href="#" on:click|preventDefault={() => selectedForm = 'edit'}>
                                     Profil módosítása
                                 </a>
                             </span>

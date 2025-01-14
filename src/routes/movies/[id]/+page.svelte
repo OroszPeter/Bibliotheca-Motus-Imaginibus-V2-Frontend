@@ -1,7 +1,7 @@
 <script>
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import { authToken, userStore, API_Url } from '../../../store.js';
+    import { authToken, userStore, API_Url, isLoggedIn } from '../../../store.js';
 
     let { movie, movieRatings, averageRating } = $page.data;
     let imageUrl = '';
@@ -13,6 +13,10 @@
     let users = {}; // User ID -> username tárolás
     let releasedYear = new Date(movie.releasedDate).getFullYear();
     let isAtWatchlist = false;
+
+    function toLogin() {
+        window.location.href = "/login";
+    }
 
     // Segédfüggvény a store-értékek szinkron kiolvasására
     function getStoreValue(store) {
@@ -33,16 +37,10 @@
         hoverRatingValue = 0;
     }
 
-    function showToast(message, type) {
-        toast = { message, type, visible: true };
-        setTimeout(() => (toast.visible = false), 3000);
-    }
-
     async function deleteMovie(id) {
         const token = getStoreValue(authToken)?.token;
 
         if (!token) {
-            showToast('Hiba: Bejelentkezés szükséges a törléshez.', 'error');
             return;
         }
 
@@ -60,28 +58,45 @@
 
             if (!response.ok) throw new Error('Nem sikerült a film törlése.');
 
-            showToast('Film sikeresen törölve!', 'success');
+            // Sikerüzenet megjelenítése
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Film törölve!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = '#DC3545';
+            successMessageDiv.style.border = '1px solid black'
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                            }, 3000);
             window.location.href = "/";
         } catch (error) {
             console.error('Hiba a film törlésekor:', error);
-            showToast('Nem sikerült a film törlése.', 'error');
         }
     }
 
     async function fetchUsernames() {
         try {
-            const response = await fetch(`${API_Url}Users`);
+            const response = await fetch(`${API_Url}Account/users`);
             if (!response.ok) throw new Error('Nem sikerült a felhasználók betöltése.');
 
             const userData = await response.json();
             users = userData.reduce((acc, user) => {
-                acc[user.id] = user.username;
+                acc[user.id] = user.userName; // userName használata username helyett
                 return acc;
             }, {});
         } catch (error) {
             console.error('Hiba a felhasználónevek lekérdezésekor:', error);
         }
     }
+
 
     let watchlistItemId = null; // A watchlist elem ID-jának tárolása
 
@@ -90,7 +105,6 @@ async function fetchWatchlist() {
     const userId = getStoreValue(userStore)?.id;
 
     if (!token || !userId) {
-        showToast('Hiba: Bejelentkezés szükséges a watchlist ellenőrzéséhez.', 'error');
         return;
     }
 
@@ -116,7 +130,6 @@ async function removeFromWatchlist() {
     const token = getStoreValue(authToken)?.token;
 
     if (!token || !watchlistItemId) {
-        showToast('Hiba: Bejelentkezés szükséges a törléshez.', 'error');
         return;
     }
 
@@ -130,12 +143,28 @@ async function removeFromWatchlist() {
 
         if (!response.ok) throw new Error('Nem sikerült a film eltávolítása a watchlistből.');
 
-        showToast('Film eltávolítva a watchlistből!', 'success');
+        // Sikerüzenet megjelenítése
+        const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Film sikeresen eltávolítva a watchlistból!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'orange';
+            successMessageDiv.style.border = '1px solid black';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                            }, 3000);
         isAtWatchlist = false;
         watchlistItemId = null; // Törlés után nullázás
     } catch (error) {
         console.error('Hiba a film eltávolításakor:', error);
-        showToast('Nem sikerült a film eltávolítása a watchlistből.', 'error');
     }
 }
 
@@ -144,7 +173,6 @@ async function removeFromWatchlist() {
         const userId = getStoreValue(userStore)?.id;
 
         if (!userId || !token) {
-            showToast('Hiba: Bejelentkezés szükséges az értékeléshez.', 'error');
             return;
         }
 
@@ -167,10 +195,25 @@ async function removeFromWatchlist() {
             movieRatings = [...movieRatings, addedRating];
             comment = '';
             rating = 0;
-            showToast('Értékelés elküldve!', 'success');
+            // Sikerüzenet megjelenítése
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Értékelés elküldve!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'green';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                            }, 3000);
         } catch (error) {
             console.error('Hiba az értékelés beküldésekor:', error);
-            showToast('Nem sikerült az értékelés elküldése.', 'error');
         }
     }
 
@@ -180,7 +223,6 @@ async function removeFromWatchlist() {
         const userId = getStoreValue(userStore)?.id;
 
         if (!userId || !token) {
-            showToast('Hiba: Bejelentkezés szükséges a watchlist-hez adáshoz.', 'error');
             return;
         }
 
@@ -201,11 +243,27 @@ async function removeFromWatchlist() {
                 throw new Error(errorMessage);
             }
 
-            showToast('Film sikeresen hozzáadva a watchlisthez!', 'success');
+            // Sikerüzenet megjelenítése
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Sikeresen hozzáadva a watchlisthez!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'yellow';
+            successMessageDiv.style.border = '1px solid black';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                            }, 3000);
             isAtWatchlist = true;
         } catch (error) {
             console.error('Hiba a watchlisthez adáskor:', error);
-            showToast('Nem sikerült a watchlisthez adás.', 'error');
         }
     }
 
@@ -214,7 +272,6 @@ async function removeFromWatchlist() {
         const token = getStoreValue(authToken)?.token;
 
         if (!token) {
-            showToast('Hiba: Bejelentkezés szükséges az értékelés törléséhez.', 'error');
             return;
         }
 
@@ -229,10 +286,26 @@ async function removeFromWatchlist() {
             if (!response.ok) throw new Error('Nem sikerült az értékelés törlése.');
 
             movieRatings = movieRatings.filter(rating => rating.id !== id);
-            showToast('Értékelés törölve!', 'success');
+            // Sikerüzenet megjelenítése
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Értékelés törölve!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = '#DC3545';
+            successMessageDiv.style.border = '1px solid black'
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                            }, 3000);
         } catch (error) {
             console.error('Hiba az értékelés törlésekor:', error);
-            showToast('Nem sikerült az értékelés törlése.', 'error');
         }
     }
 
@@ -324,6 +397,7 @@ async function removeFromWatchlist() {
                         </td>
                     </tr>
                     <tr>
+                        {#if $isLoggedIn}
                         <td class="comment" colspan="2">
                             <div class="addcomment mt-4">
                                 <div class="star-rating mb-3" on:mouseleave={resetRating}>
@@ -341,6 +415,14 @@ async function removeFromWatchlist() {
                                 <button id="send" class="btn btn-success" on:click={submitRating}>Küldés</button>
                             </div>
                         </td>
+                        {:else}
+                        <td>
+                        <div id="login">
+                            <h5 class="text-center">Az értékelés küldéséhez jelentkezz be!</h5>
+                            <button class="btn btn-warning" on:click={() => toLogin()}>Bejelentkezés</button>
+                        </div>
+                        </td>
+                        {/if}
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -355,7 +437,10 @@ async function removeFromWatchlist() {
                                             {#each Array(5 - rating.ratingNumber).fill('☆') as _}
                                                 <span class="star">☆</span>
                                             {/each}
-                                            <p><strong>{rating.username || 'Ismeretlen felhasználó'}</strong>: {rating.comment}</p>
+                                            <p>
+                                                <strong>{users[rating.userId] || 'Ismeretlen felhasználó'}</strong>: 
+                                                {rating.comment}
+                                            </p>
                                         </div>
                                         {#if getStoreValue(userStore)?.id === rating.userId}
                                             <button class="btn btn-danger" on:click={() => deleteRating(rating.id)}>Törlés</button>
@@ -379,6 +464,28 @@ async function removeFromWatchlist() {
 
 
 <style>
+    #login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#login h5 {
+    margin-bottom: 20px; /* Hely a szöveg és a gomb között */
+}
+
+#login .btn {
+    padding: 10px 20px; /* A gomb méretének növelése */
+    color: white;
+}
+#login .btn:hover {
+    color: orange;
+}
     .container {
         margin-left: 300px;
         padding: 20px;
