@@ -6,70 +6,85 @@
   let ratings = [];
   let isLoading = true;
 
-  // API hívás a filmek és értékelések lekérésére
   onMount(async () => {
-  try {
-    // Filmek és értékelések betöltése
-    const moviesResponse = await fetch(`${API_Url}Movie`);
-    if (!moviesResponse.ok) throw new Error('Hiba a filmek lekérésekor');
-    movies = await moviesResponse.json();
+    try {
+      const moviesResponse = await fetch(`${API_Url}Movie`);
+      if (!moviesResponse.ok) throw new Error('Hiba a filmek lekérésekor');
+      movies = await moviesResponse.json();
 
-    const ratingsResponse = await fetch(`${API_Url}Ratings`);
-    if (!ratingsResponse.ok) throw new Error('Hiba az értékelések lekérésekor');
-    ratings = await ratingsResponse.json();
+      const ratingsResponse = await fetch(`${API_Url}Ratings`);
+      if (!ratingsResponse.ok) throw new Error('Hiba az értékelések lekérésekor');
+      ratings = await ratingsResponse.json();
 
-    // Csak a 4 legfrissebb film kiválasztása az addedAt alapján
-    movies = movies
-      .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)) // Rendezés csökkenő sorrendbe
-      .slice(0, 4); // Az első 4 film kiválasztása
+      // Rendezés és 8 legfrissebb film kiválasztása
+      movies = movies
+        .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt))
+        .slice(0, 8);
 
-    // Átlag kiszámítása és hozzáadása minden filmhez
-    movies.forEach(movie => {
-      const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
-      const averageRating = movieRatings.length
-        ? movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length
-        : 0;
-      movie.averageRating = averageRating.toFixed(1);
-    });
+      movies.forEach(movie => {
+        const movieRatings = ratings.filter(rating => rating.movieId === movie.id);
+        const averageRating = movieRatings.length
+          ? movieRatings.reduce((sum, rating) => sum + rating.ratingNumber, 0) / movieRatings.length
+          : 0;
+        movie.averageRating = averageRating.toFixed(1);
+      });
 
-    // Képek betöltése
-    await Promise.all(
-      movies.map(async (movie) => {
-        try {
-          movie.image = `${API_Url}Movie/${movie.id}/kep`;
-        } catch {
-          movie.image = 'https://placehold.co/400x600';
-        }
-      })
-    );
+      await Promise.all(
+        movies.map(async (movie) => {
+          try {
+            movie.image = `${API_Url}Movie/${movie.id}/kep`;
+          } catch {
+            movie.image = 'https://placehold.co/400x600';
+          }
+        })
+      );
 
-    isLoading = false; // Betöltés vége
-  } catch (error) {
-    console.error('Hiba:', error);
-  }
-});
+      isLoading = false;
+    } catch (error) {
+      console.error('Hiba:', error);
+    }
+  });
 </script>
+
 {#if isLoading}
-<div class="spinner-grow" role="status">
-</div>
+<div class="spinner-grow" role="status"></div>
 {:else}
 <div class="content mt-5">
   <div class="container mt-4">
     <h2 class="mb-5">Újdonságok</h2>
+    <!-- Első sor -->
     <div class="row">
-      {#each movies as movie}
+      {#each movies.slice(0, 4) as movie}
         <div class="col-md-3 mb-4">
           <div class="card">
-            <!-- Link a képhez -->
             <a href={`/movies/${movie.id}`} class="image-link">
               <div class="image-container">
                 <img src={movie.image} class="card-img-top" alt={movie.title} />
-                <div class="badge">{movie.averageRating}</div> <!-- Átlagértékelés a sárga oválisban -->
+                <div class="badge">{movie.averageRating}</div>
               </div>
             </a>
             <div class="card-body">
               <h5 class="card-title">{movie.title}</h5>
-              <small class="text-muted">{movie.genre}</small> <!-- A leírás helyett genre jelenik meg -->
+              <small class="text-muted">{movie.genre}</small>
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+    <!-- Második sor -->
+    <div class="row">
+      {#each movies.slice(4, 8) as movie}
+        <div class="col-md-3 mb-4">
+          <div class="card">
+            <a href={`/movies/${movie.id}`} class="image-link">
+              <div class="image-container">
+                <img src={movie.image} class="card-img-top" alt={movie.title} />
+                <div class="badge">{movie.averageRating}</div>
+              </div>
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">{movie.title}</h5>
+              <small class="text-muted">{movie.genre}</small>
             </div>
           </div>
         </div>
@@ -80,7 +95,7 @@
 {/if}
 
 <style>
-  .spinner-grow{
+  .spinner-grow {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -89,17 +104,16 @@
   }
   
   .content {
-    margin-left: 300px; /* Sidebar szélességének megfelelő eltolás */
-    padding: 20px; /* Extra belső tér a tartalom körül */
-    color: white; /* Alapértelmezett fehér szín a szövegekhez */
+    margin-left: 300px;
+    padding: 20px;
+    color: white;
   }
 
-  /* Kártya alapstílus */
   .card {
-    border: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: #333333; /* Eredeti háttérszín */
-    color: white; /* Fehér szín a kártya szövegeinek */
+    background-color: #333333;
+    color: white;
+    border: 5px solid #811331;
   }
 
   .card:hover {
@@ -108,57 +122,49 @@
     transition: all 0.3s ease-in-out;
   }
 
-  /* Link a képen */
   .image-link {
-    display: block; /* A link legyen blokkszintű, hogy a teljes képet lefedje */
-    text-decoration: none; /* Link alapértelmezett aláhúzása eltávolítva */
+    display: block;
+    text-decoration: none;
   }
 
-  /* A képre vonatkozó stílusok */
   .image-container {
     position: relative;
   }
 
   .card-img-top {
-    padding-bottom: 10px; /* A kép és a szöveg közötti távolság csökkentése */
-    margin-bottom: 10px; /* Kis távolság a kép alatt */
+    padding-bottom: 10px;
+    margin-bottom: 10px;
   }
 
-  /* Sárga ovális elem a kép felső részén */
   .badge {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ffc107;
-  width: 50px;
-  height: 20px;
-  border-radius: 50px;
-  z-index: 5;
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  line-height: 20px;
-}
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffc107;
+    width: 50px;
+    height: 20px;
+    border-radius: 50px;
+    z-index: 1;
+  }
 
-  /* Kártya tartalmának illesztése */
+
   .card-body {
-    padding-top: 5px; /* Kevesebb padding a tetején */
-    padding-bottom: 5px; /* Kevesebb padding az alján */
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 
   .card-title {
-    margin-bottom: 5px; /* A cím és a leírás közötti távolság csökkentése */
-    color: white; /* Cím színének fehérre állítása */
+    margin-bottom: 5px;
+    color: white;
   }
 
-  /* Fehér szín a small tag számára */
   small {
-    font-size: 0.875rem; /* A leírás szöveg méretének csökkentése */
-    color: white !important; /* Biztosítja, hogy a small szöveg fehér legyen */
+    font-size: 0.875rem;
+    color: white !important;
   }
 
   .card:hover .card-body {
-    background-color: #333333; /* Az alap háttérszín megmarad hover során is */
+    background-color: #333333;
   }
 </style>
