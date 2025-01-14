@@ -108,6 +108,19 @@
 
         if (response.ok) {
             const message = await response.text(); // Szöveges válasz feldolgozása
+            const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Profil sikeresen törölve!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'red';
+            successMessageDiv.style.border = '1px solid black';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
 
             // Adatok törlése a store-ból és a localStorage-ból
             userStore.set({});
@@ -117,6 +130,7 @@
             // Átirányítás a kezdőlapra vagy bejelentkező oldalra
             setTimeout(() => {
                 window.location.href = '/';
+                successMessageDiv.remove();
             }, 1000);
             isLoggedIn.set(false);
         }
