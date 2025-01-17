@@ -1,4 +1,6 @@
 <script>
+    import { goto } from "$app/navigation";
+  import { isLoggedIn, userStore } from "../../store.js";
     let carousel;
     let isDragStart = false, isDragging = false, prevPageX, prevScrollLeft, positionDiff;
     let showLeftIcon = false, showRightIcon = true;
@@ -53,8 +55,12 @@
       isDragging = false;
       autoSlide();
     }
+    function Goto() {
+      window.location.href = "/login";
+    }
   </script>
-    <div class="content mt-5">
+  {#if $isLoggedIn}
+     <div class="content mt-5">
       <div class="container mt-4">
         <h2 class="mb-5">Watchlist</h2>
   <div class="wrapper">
@@ -74,6 +80,17 @@
   </div>
   </div>
 </div>
+  {:else}
+  <div class="content mt-5">
+    <div class="container mt-4">
+      <h2 class="text-center">Jelentkezz vagy regisztrálj hogy hozzáférj a watchlist oldalhoz</h2>
+      <div class="d-flex align-items-center justify-content-center mt-3">
+        <button on:click={Goto()} class="btn btn-danger p-3">Bejelentkezés</button>
+      </div>
+    </div>
+  </div>
+  {/if}
+   
   
   <style>
     /* Import Google font - Poppins */
