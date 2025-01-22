@@ -119,7 +119,7 @@
   <div class="content mt-5">
     <div class="container mt-4">
       <h2 class="mb-5">Watchlist</h2>
-      <div class="wrapper">
+      <div class="wrapper w-100">
         <i id="left" class="bi bi-arrow-left bg-danger" on:click={() => moveCarousel('left')} style="display: {showLeftIcon ? 'block' : 'none'}"></i>
         <div class="carousel" bind:this={carousel} on:mousedown={dragStart} on:touchstart={dragStart} on:mousemove={dragging} on:touchmove={dragging} on:mouseup={dragStop} on:touchend={dragStop}>
           {#each $movies as movie (movie.id)}

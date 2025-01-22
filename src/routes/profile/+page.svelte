@@ -66,7 +66,7 @@
         }
 
         if (oldPassword && newPassword) {
-            const success = await updateUserData('Account/password', { oldPassword, newPassword });
+            const success = await updateUserData('Account/update-password', { oldPassword, newPassword });
             if (success) {
                 isUpdated = true;
             }
