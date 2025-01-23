@@ -171,15 +171,15 @@
                     <td><input type="text" placeholder="Rendező" bind:value={director} /></td>
                   </tr>
                   <tr>
-                    <td>Színész 1</td>
+                    <td></td>
                     <td><input type="text" placeholder="Színész" bind:value={actor1} /></td>
                   </tr>
                   <tr>
-                    <td>Színész 2</td>
+                    <td>Színészek</td>
                     <td><input type="text" placeholder="Színész" bind:value={actor2} /></td>
                   </tr>
                   <tr>
-                    <td>Színész 3</td>
+                    <td></td>
                     <td><input type="text" placeholder="Színész" bind:value={actor3} /></td>
                   </tr>
                 </tbody>

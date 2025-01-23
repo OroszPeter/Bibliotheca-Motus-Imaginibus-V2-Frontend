@@ -358,8 +358,10 @@ async function removeFromWatchlist() {
                                     {:else}
                                     <button class="btn btn-primary btn-sm ms-2" on:click={() => AddToWatchlist()} title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button>
                                     {/if}
+                                    {#if $isLoggedIn && ($userStore.roles) && $userStore.roles[0] === "Admin"}
                                     <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)}><i class="bi bi-trash" title="Törlés"></i></button>
                                     <button class="btn btn-success btn-sm" title="Szerkesztés"><i class="bi bi-pencil"></i></button>
+                                    {/if}
                                 </h2>
                                 <p><strong>{movie.genre}</strong> - {movie.length}p</p>
                                 {#if movie.isSeries}
@@ -422,9 +424,9 @@ async function removeFromWatchlist() {
                             </div>
                         </td>
                         {:else}
-                        <td>
-                        <div id="login">
-                            <h5 class="text-center">Az értékelés küldéséhez jelentkezz be!</h5>
+                        <td colspan="2">
+                        <div id="login" class="w-100">
+                            <h5 class="text-center">Az értékeléshez jelentkezz be!</h5>
                             <button class="btn btn-warning" on:click={() => toLogin()}>Bejelentkezés</button>
                         </div>
                         </td>
@@ -479,6 +481,8 @@ async function removeFromWatchlist() {
     border: 1px solid black;
     padding: 10px;
     border-radius: 10px;
+    height: 100%;
+    background-color: #dc3545;
 }
 
 #login h5 {

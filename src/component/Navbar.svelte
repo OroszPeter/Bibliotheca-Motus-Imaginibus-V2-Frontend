@@ -6,22 +6,27 @@
   const handleSearch = () => {
     // Átirányítás a keresett kifejezés alapján a result oldalra
     window.location.href = `/result?query=${searchQuery}`;
-};
+  };
 
   $: isUserLoggedIn = $isLoggedIn; // Automatikus frissítés a store alapján
   $: userName = $userStore.userName || ''; // Felhasználónév figyelése
 
   // Dinamikusan frissülő menüelemek
   $: menuItems = [
-  { name: `Újdonságok`, link: "/", icon: "bi-house" },
-  { name: "Filmek", link: "/movies", icon: "bi-film" },
-  { name: "Sorozatok", link: "/series", icon: "bi-collection-play" },
-  { name: "Watchlist", link: "/watchlist", icon: "bi-bookmark" },
-  { name: "Új tartalom hozzáadása", link: "/add-movie", icon: "bi-plus-circle" },
-  ...(isUserLoggedIn
-    ? [{ name: "Kijelentkezés", link: "#logout", icon: "bi-box-arrow-right" }]
-    : [{ name: "Bejelentkezés", link: "/login", icon: "bi-box-arrow-in-right" }]),
-];
+    { name: `Újdonságok`, link: "/", icon: "bi-house" },
+    { name: "Filmek", link: "/movies", icon: "bi-film" },
+    { name: "Sorozatok", link: "/series", icon: "bi-collection-play" },
+    { name: "Watchlist", link: "/watchlist", icon: "bi-bookmark" },
+    ...(isUserLoggedIn
+      ? [
+          { name: "Kijelentkezés", link: "#logout", icon: "bi-box-arrow-right" },
+          // Ellenőrizzük, hogy a roles létezik-e és hogy az első elem "Admin"
+          ...(Array.isArray($userStore.roles) && $userStore.roles[0] === "Admin"
+            ? [{ name: "Tartalom hozzáadása", link: "/add-content", icon: "bi-plus-circle" }]
+            : [])
+        ]
+      : [{ name: "Bejelentkezés", link: "/login", icon: "bi-box-arrow-in-right" }]),
+  ];
 
   function handleLogout() {
       localStorage.removeItem('authToken');
@@ -36,9 +41,12 @@
       });
       isLoggedIn.set(false);
       authToken.set('');
-      window.location.href = '/login'; // Visszairányítás a bejelentkezéshez
+      // window.location.href = '/login'; // Visszairányítás a bejelentkezéshez
   }
 </script>
+
+
+
 
 <div class="navigation">
   <!-- Navbar -->
