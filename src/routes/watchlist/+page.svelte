@@ -250,32 +250,39 @@
   }
 
   .movie-item {
-    display: inline-block;
-    width: 200px;
-    margin-right: 14px;
-    text-align: center;
-  }
+  display: inline-block;
+  width: 200px;
+  margin-right: 14px;
+  text-align: center;
+  vertical-align: top; /* Győződjünk meg arról, hogy az elemek függőlegesen egy vonalban vannak */
+}
 
-  .movie-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+.movie-item img {
+  width: 100%;
+  height: auto; /* Az eredeti arányok megtartása */
+  object-fit: cover; /* Biztosítja, hogy a képek megfelelően legyenek kitöltve */
+  display: block; /* Blokk szintű elem, hogy pontosabban illeszkedjen */
+  margin-bottom: 10px; /* Hézag a kép és a cím között */
+}
 
-  .movie-info {
-    color: white;
-    margin-top: 10px;
-  }
+.movie-info {
+  text-align: center; /* Címek középre igazítása */
+  word-wrap: break-word; /* Hosszú szöveg tördelése */
+  overflow: hidden; /* Elrejtjük a szöveg túlfolyását */
+  text-overflow: ellipsis; /* Három ponttal jelöljük a túl hosszú szöveget */
+  white-space: normal; /* Többsoros cím megjelenítése */
+}
 
-  .movie-info h3 {
-    font-size: 1rem;
-    margin: 0;
-  }
+.movie-info h3 {
+  font-size: 1rem;
+  margin: 0;
+}
 
-  .movie-info p {
-    font-size: 0.9rem;
-    margin: 0;
-  }
+.movie-info p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 
   @media screen and (max-width: 900px) {
     .carousel img {

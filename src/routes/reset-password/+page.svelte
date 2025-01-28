@@ -3,18 +3,18 @@
   <div class="container">
       <div class="row">
           <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
-              <div class="form-container bg-danger"></div>
-<form class="form-horizontal form-right" >
-  <h3 class="title">Elfelejtett jelszó</h3>
-  <div class="form-group">
-    <span class="input-icon"><i class="bi bi-envelope-fill"></i></span>
-    <input class="form-control" type="email" placeholder="E-mail cím">
-</div>
-  <button id="login" class="btn signin bg-danger">Küldés</button>
-  <span class="info">
-    Fontos hogy a felhasználódhoz tartozó érvényes email címedet add meg.
-  </span>
-</form>
+              <div class="form-container bg-danger">
+                <form class="form-horizontal form-right" >
+                <h3 class="title">Elfelejtett jelszó</h3>
+                <div class="form-group">
+                    <span class="input-icon"><i class="bi bi-envelope-fill"></i></span>
+                    <input class="form-control" type="email" placeholder="E-mail cím">
+                </div>
+                <button id="login" class="btn signin bg-danger">Küldés</button>
+                <span class="info">
+                    Fontos hogy a felhasználódhoz tartozó érvényes email címedet add meg.
+                </span>
+                </form>
               </div>
           </div>
       </div>
@@ -23,17 +23,19 @@
 <style>
   .info{
       color: black;}
-  .form-container{
-      position: relative;
-      top: 50%;
-      left: 75%;
-      font-family: 'Roboto', sans-serif;
-      font-size: 0;
-      padding: 0 15px;
-      border: 1px solid #DC2036;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  }
+      .form-container {
+    position: absolute; /* A formot az ablakhoz igazítjuk */
+    top: 50%; /* Függőlegesen középre */
+    left: 50%; /* Vízszintesen középre */
+    transform: translate(-50%, -50%); /* Pontosan középre tolás */
+    font-family: 'Roboto', sans-serif;
+    font-size: 0;
+    padding: 15px;
+    border: 1px solid #DC2036;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    background-color: #fff; /* Biztosítja, hogy a háttér ne legyen átlátszó */
+}
   .form-container .form-icon{
       color: #fff;
       font-size: 13px;
