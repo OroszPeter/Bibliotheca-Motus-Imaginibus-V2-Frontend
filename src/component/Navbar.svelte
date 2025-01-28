@@ -22,7 +22,7 @@
           { name: "Kijelentkezés", link: "#logout", icon: "bi-box-arrow-right" },
           // Ellenőrizzük, hogy a roles létezik-e és hogy az első elem "Admin"
           ...(Array.isArray($userStore.roles) && $userStore.roles[0] === "Admin"
-            ? [{ name: "Tartalom hozzáadása", link: "/add-content", icon: "bi-plus-circle" }]
+            ? [{ name: "Tartalom hozzáadása", link: "/add-movie", icon: "bi-plus-circle" }]
             : [])
         ]
       : [{ name: "Bejelentkezés", link: "/login", icon: "bi-box-arrow-in-right" }]),

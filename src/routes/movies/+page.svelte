@@ -54,54 +54,96 @@
 </script>
 
 <style>
-  .spinner-grow{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 50px;
-    height: 50px;
-  }
-  .content {
-    margin-left: 300px;
-    padding: 20px;
-    color: white;
-  }
+.spinner-grow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+}
 
-  .category-button {
-    display: inline-block;
-    margin-right: 10px;
-    padding: 10px 15px;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-  }
+.content {
+  margin-left: 300px;
+  padding: 20px;
+  color: white;
+}
 
-  .category-button.active {
-    background-color: #811331;
-    font-weight: bold;
-  }
+.category-button {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 10px 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
 
-  .category-button:hover {
-    background-color: #555;
-  }
+.category-button.active {
+  background-color: #811331;
+  font-weight: bold;
+}
 
-  .card {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: #333333;
-    color: white;
-    border: 5px solid #811331;
-  }
+.category-button:hover {
+  background-color: #555;
+}
 
-  .card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transform: translateY(-5px);
-    transition: all 0.3s ease-in-out;
-  }
+.card {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #333333;
+  color: white;
+  border: 5px solid #811331;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* A kártyák egységes magasságának biztosítása */
+}
 
-  .badge {
+.card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+  transition: all 0.3s ease-in-out;
+}
+
+.card-title {
+  margin-bottom: 5px;
+  font-size: 1rem; /* Egységes betűméret */
+  line-height: 1.2; /* Egyenletes sorok közötti távolság */
+  text-align: center; /* Középre igazítás */
+  word-wrap: break-word; /* Hosszú szavak tördelése */
+  white-space: normal; /* Több soros tördelés engedélyezése */
+  min-height: 3em; /* Legalább két sor hely fenntartása, ékezetek figyelembevételével */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-body {
+  padding: 10px; /* Egyenletes belső margók */
+  flex-grow: 1; /* A tartalom helykitöltése */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.image-container {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3; /* Képek aránya */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Képarányok megőrzése */
+}
+
+.badge {
     position: absolute;
     top: -10px;
     left: 50%;
@@ -112,6 +154,7 @@
     border-radius: 50px;
     z-index: 1;
   }
+
 
   .card-body {
     padding-top: 5px;

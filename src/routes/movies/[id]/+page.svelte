@@ -308,6 +308,69 @@ async function removeFromWatchlist() {
             console.error('Hiba az értékelés törlésekor:', error);
         }
     }
+    let isEditing = false; // A szerkesztési mód követése
+
+function toggleEdit() {
+    isEditing = !isEditing;
+}
+
+async function updateMovie() {
+    const token = getStoreValue(authToken)?.token;
+    const userId = getStoreValue(userStore)?.id;
+
+    if (!token || !userId || !isEditing) {
+        return;
+    }
+
+    const updatedMovie = {
+        ...movie,
+        title: movie.title,
+        genre: movie.genre,
+        description: movie.description,
+        director: movie.director,
+        actor1: movie.actor1,
+        actor2: movie.actor2,
+        actor3: movie.actor3,
+        releasedDate: movie.releasedDate,
+        length: movie.length,
+        isSeries: movie.isSeries,
+        numberOfSeasons: movie.numberOfSeasons,
+        numberOfEpisodes: movie.numberOfEpisodes,
+    };
+
+    try {
+        const response = await fetch(`${API_Url}Movie/${movie.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(updatedMovie),
+        });
+
+        if (!response.ok) throw new Error('Nem sikerült a film frissítése.');
+
+        const updatedMovieData = await response.json();
+        movie = updatedMovieData;  // Módosítás után frissítjük a film adatokat
+        isEditing = false; // Kilépünk a szerkesztési módból
+        showToast('Film frissítve!', 'success'); // Sikeres üzenet
+    } catch (error) {
+        console.error('Hiba a film frissítésekor:', error);
+        showToast('Hiba történt a frissítéskor!', 'error'); // Hibaüzenet
+    }
+
+    toggleEdit(); // Szerkesztés mód váltása
+}
+
+
+function showToast(message, type) {
+    toast.message = message;
+    toast.type = type;
+    toast.visible = true;
+    setTimeout(() => {
+        toast.visible = false;
+    }, 3000);
+}
 
     onMount(async () => {
         try {
@@ -336,12 +399,34 @@ async function removeFromWatchlist() {
     {#if isLoading}
         <div>Betöltés...</div>
     {:else if movie}
+        {#if isEditing}
+        <div class="container pt-5 w-75">
+            <h2>Szerkesztés</h2>
+            <input type="text" bind:value={movie.title} class="form-control" />
+            <input type="text" bind:value={movie.releasedDate} class="form-control" />
+            <input type="text" bind:value={movie.genre} class="form-control" />
+            <input type="text" bind:value={movie.length} class="form-control" />
+            {#if movie.isSeries}
+            <input type="text" bind:value={movie.numberOfSeasons} class="form-control" />
+            <input type="text" bind:value={movie.numberOfEpisodes} class="form-control" />
+            {/if}
+            <textarea bind:value={movie.description} class="form-control"></textarea>
+            <input type="text" bind:value={movie.director} class="form-control" />
+            <input type="text" bind:value={movie.actor1} class="form-control" />
+            <input type="text" bind:value={movie.actor2} class="form-control" />
+            <input type="text" bind:value={movie.actor3} class="form-control" />
+            <button class="btn btn-success btn-sm ms-2 mt-2" on:click={updateMovie}>Szerkesztés</button>
+            <button class="btn btn-danger btn-sm ms-2 mt-2" on:click={toggleEdit}>Mégse </button>
+            <!-- További mezők is hasonló módon -->
+        </div>
+        {:else}
+        {/if}
         <div class="container pt-5 w-75">
             <table class="pt-5">
                 <tbody>
                     <tr>
                         <td rowspan="2">
-                            <div class="picture">
+                            <div class="picture align-top">
                                 {#if imageUrl}
                                     <img src={imageUrl} class="img-fluid" alt={movie.title} />
                                 {:else}
@@ -349,7 +434,7 @@ async function removeFromWatchlist() {
                                 {/if}
                             </div>
                         </td>
-                        <td class="desc">
+                        <td class="desc align-top">
                             <div class="content">
                                 <h2>
                                     {movie.title} <small>({releasedYear})</small>
@@ -360,14 +445,21 @@ async function removeFromWatchlist() {
                                     {/if}
                                     {#if $isLoggedIn && ($userStore.roles) && $userStore.roles[0] === "Admin"}
                                     <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)}><i class="bi bi-trash" title="Törlés"></i></button>
-                                    <button class="btn btn-success btn-sm" title="Szerkesztés"><i class="bi bi-pencil"></i></button>
+                                    {#if $isLoggedIn && $userStore.roles && $userStore.roles[0] === "Admin"}
+                                        {#if isEditing}
+                                        {:else}
+                                        <button class="btn btn-success btn-sm ms-2" on:click={toggleEdit}><i class="bi bi-pencil"></i></button>
+                                        {/if}
+    {/if}
                                     {/if}
                                 </h2>
+                                
                                 <p><strong>{movie.genre}</strong> - {movie.length}p</p>
                                 {#if movie.isSeries}
                                     {#if movie.numberOfSeasons > 1}
                                     <p>{movie.numberOfSeasons} évad, {movie.numberOfEpisodes} epizód</p>
                                     {:else}
+                                    <p>{movie.numberOfEpisodes} epizód</p>
                                     {/if}
                                 {/if}
                                 <small>{averageRating.toFixed(1)} &#9733;</small>
@@ -375,29 +467,25 @@ async function removeFromWatchlist() {
                             </div>
                         </td>
                         <td>
-                            <div class="people">
+                            <div class="people align-top">
                                 <table class="table table-dark table-striped">
                                     <thead>
-                                        <tr>
-                                            <th colspan="2" class="text-center">Rendezte</th>
-                                        </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Rendezte</td>
-                                            <td>{movie.director}</td>
+                                            <td class="p"><b>Rendezte</b></td>
+                                            <td class="p">{movie.director}</td>
                                         </tr>
                                         <tr>
-                                            <td></td>
-                                            <td>{movie.actor1}</td>
+                                            <td class="align-middle p" rowspan="3"><b>Szereplők</b></td>
+                                            <td class="p">{movie.actor1}</td>
                                         </tr>
                                         <tr>
-                                            <td>Szereplők</td>
-                                            <td>{movie.actor2}</td>
+                                            <td class="p">{movie.actor2}</td>
                                         </tr>
                                         <tr>
-                                            <td></td>
-                                            <td>{movie.actor3}</td>
+                                            
+                                            <td class="p">{movie.actor3}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -407,7 +495,7 @@ async function removeFromWatchlist() {
                     <tr>
                         {#if $isLoggedIn}
                         <td class="comment" colspan="2">
-                            <div class="addcomment mt-4">
+                            <div class="addcomment mt-4 align-top">
                                 <div class="star-rating mb-3" on:mouseleave={resetRating}>
                                     {#each Array(5).fill(0) as _, index}
                                         <label
@@ -472,6 +560,9 @@ async function removeFromWatchlist() {
 
 
 <style>
+    .p{
+        border: 1px solid black;
+    }
     #login {
     display: flex;
     flex-direction: column;
