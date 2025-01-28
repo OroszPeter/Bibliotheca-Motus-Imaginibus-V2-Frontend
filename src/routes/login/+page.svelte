@@ -175,7 +175,7 @@
                             </div>
                             <button id="login" class="btn signin bg-danger">Bejelentkezés</button>
                             <span class="forgot-pass">
-                                <a href="#">Elfelejtetted a Felhasználóneved/Jelszavad?</a>
+                                <a href="/reset-password">Elfelejtetted a jelszavad?</a>
                             </span>
                         </form>
                     {/if}

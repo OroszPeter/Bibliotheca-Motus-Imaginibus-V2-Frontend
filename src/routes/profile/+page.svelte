@@ -188,7 +188,11 @@
                             </span>
                         </div>
                         <form class="form-horizontal form-right" transition:slide>
-                            <h3 class="title">{lastName} {firstName}</h3>
+                            {#if $isLoggedIn && ($userStore.roles) && $userStore.roles[0] === "Admin"}
+                            <h3 class="title neontext">{lastName} {firstName}</h3>
+                {:else}
+                <h3 class="title">{lastName} {firstName}</h3>
+                {/if}
                             <h5><b>Felhasználónév:</b> {userName}</h5>
                             <h5><b>Email:</b> {email}</h5>
                             <button class="btn btn-danger mt-5" on:click={handleDeleteProfile}>Profil törlése</button>
