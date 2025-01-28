@@ -68,7 +68,11 @@
           <div id="profile" class="text-center">
               {#if isUserLoggedIn}
               <a class="text-white" href="/profile">
+                {#if $isLoggedIn && ($userStore.roles) && $userStore.roles[0] === "Admin"}
+                <span class="neontext">{userName} <i class="bi bi-lightning-charge-fill"></i></span>
+                {:else}
                 <span>{userName}</span>
+                {/if}
               </a>
               {/if}
           </div>
@@ -97,6 +101,19 @@
 </div>
   
   <style>
+    .neontext {
+  color: #fff;
+  text-shadow:
+      0 0 7px #fff,
+      0 0 10px #fff,
+      0 0 21px #fff,
+      0 0 42px #0fa,
+      0 0 82px #0fa,
+      0 0 92px #0fa,
+      0 0 102px #0fa,
+      0 0 151px #0fa;
+}
+  
     .navigation {
       display: flex;
       flex-direction: column;
