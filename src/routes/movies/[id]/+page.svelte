@@ -417,7 +417,7 @@ function showToast(message, type) {
             <input type="text" bind:value={movie.actor3} class="form-control" />
             <button class="btn btn-success btn-sm ms-2 mt-2" on:click={updateMovie}>Szerkesztés</button>
             <button class="btn btn-danger btn-sm ms-2 mt-2" on:click={toggleEdit}>Mégse </button>
-            <!-- További mezők is hasonló módon -->
+            <!-- További mezők is hasonló módo -->
         </div>
         {:else}
         {/if}
