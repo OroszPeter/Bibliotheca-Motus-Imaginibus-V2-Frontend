@@ -62,9 +62,15 @@
           </div>
           <div id="profile" class="text-center">
               {#if isUserLoggedIn}
+              {#if ($userStore.roles) && $userStore.roles[0] === "Admin"}
+              <a class="text-white neontext" href="/profile">
+                {userName} <i class="bi bi-lightning-charge-fill"></i>
+              </a> 
+              {:else}
               <a class="text-white" href="/profile">
-                <i class="bi bi-person-circle"></i>
+                {userName}
               </a>
+              {/if}
               {/if}
           </div>
       </div>
@@ -225,7 +231,7 @@
 .sidebar-item i {
   margin-right: 10px; /* Térköz az ikon és a szöveg között */
 }
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
     .menu-text {
       display: none;
     }

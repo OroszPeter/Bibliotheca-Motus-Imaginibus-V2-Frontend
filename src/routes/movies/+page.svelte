@@ -84,14 +84,14 @@
 /* Kategória gombok */
 .category-button {
   display: inline-block;
-  margin-right: 10px;
-  padding: 10px 15px;
+  margin-right: 20px; /* Növelt margó a nagy képernyőkhöz */
+  padding: 12px 20px; /* Kisebb gombok paddingja */
   background-color: #333;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.1rem; /* Nagyobb betűméret */
 }
 
 .category-button.active {
@@ -114,12 +114,63 @@
   justify-content: space-between;
   height: 100%;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.card:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transform: translateY(-5px);
-  transition: all 0.3s ease-in-out;
+/* Kép konténer */
+.image-container {
+  width: 100%;
+  height: auto;
+  max-height: 500px; /* Maximális magasság, ha szükséges */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* A badge elhelyezéséhez szükséges */
+  /* overflow: hidden; Kép ne lógjon ki */
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Értékelés badge */
+.badge {
+  position: absolute;
+  top: -10px; /* Eltoljuk a badge-t, hogy kilógjon a kép tetejéből */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffc107;
+  width: 50px;
+  height: 20px;
+  border-radius: 50px;
+  z-index: 1; /* Biztosítja, hogy a badge mindig a kép fölött legyen */
+}
+
+/* Rács elrendezés a kártyákhoz */
+.row {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(1, 1fr); /* Mobilon 1 oszlop */
+}
+
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: repeat(2, 1fr); /* Tableten 2 oszlop */
+  }
+}
+
+@media (min-width: 1024px) {
+  .row {
+    grid-template-columns: repeat(3, 1fr); /* Nagy képernyőn 3 oszlop */
+  }
+}
+
+@media (min-width: 1200px) {
+  .row {
+    grid-template-columns: repeat(4, 1fr); /* Nagyon nagy képernyőkön 4 oszlop */
+  }
 }
 
 /* Kártya cím */
@@ -146,75 +197,28 @@
   justify-content: space-between;
 }
 
-/* Sorok reszponzív elrendezése */
-.row {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(1, 1fr); /* Mobilon 1 oszlop */
+/* Kártyák szélességét biztosítjuk */
+.card {
+  width: 100%; /* A kártyák 100%-ban kitöltik az oszlopot */
 }
 
-@media (min-width: 768px) {
-  .row {
-    grid-template-columns: repeat(2, 1fr); /* Tableten 2 oszlop */
-  }
-}
-
-@media (min-width: 1024px) {
-  .row {
-    grid-template-columns: repeat(4, 1fr); /* Nagyobb képernyőn 4 oszlop */
-  }
-}
-
-/* Képek konténer */
-.image-container {
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-/* Képméretek eszközök szerint */
+/* Reszponzív kártyák mobilon és asztali nézeten */
 @media (max-width: 768px) {
-  .image-container {
-    width: 100%;
-    height: 400px;
+  .card {
+    width: 100%; /* Mobilon biztosítja, hogy a kártyák kitöltsék az oszlopot */
   }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
-  .image-container {
-    width: 100%;
-    height: 350px;
+  .card {
+    width: 100%; /* Tableten is biztosítja, hogy a kártyák megfelelően elrendeződjenek */
   }
 }
 
 @media (min-width: 1024px) {
-  .image-container {
-    width: 100%;
-    height: 300px;
+  .card {
+    width: 100%; /* Nagyobb képernyőkön is rugalmasan alkalmazkodik */
   }
-}
-
-/* Értékelés badge */
-.badge {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ffc107;
-  width: 50px;
-  height: 20px;
-  border-radius: 50px;
-  z-index: 1;
 }
 
 /* Szövegek */
@@ -224,7 +228,6 @@ small {
 }
 
 </style>
-
 
 {#if isLoading}
 <div class="spinner-grow" role="status"></div>
@@ -248,7 +251,7 @@ small {
         <h4>{genre}</h4>
         <div class="row">
           {#each categorizedMovies[genre].slice(0, 4) as movie}
-            <div class="col-md-3 mb-4">
+            <div class="col mb-4">
               <div class="card">
                 <a href={`/movies/${movie.id}`} class="image-link">
                   <div class="image-container">
@@ -273,7 +276,7 @@ small {
       <h4>{selectedCategory}</h4>
       <div class="row">
         {#each categorizedMovies[selectedCategory] as movie}
-          <div class="col-md-3 mb-4">
+          <div class="col mb-4">
             <div class="card">
               <a href={`/movies/${movie.id}`} class="image-link">
                 <div class="image-container">

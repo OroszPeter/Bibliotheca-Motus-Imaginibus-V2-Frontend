@@ -173,9 +173,8 @@
 
 .image-container img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
 }
 
 /* Értékelés badge */
@@ -188,7 +187,7 @@
   width: 50px;
   height: 20px;
   border-radius: 50px;
-  z-index: 2; /* Biztosítja, hogy a badge mindig a kép fölött legyen */
+  z-index: 1; /* Biztosítja, hogy a badge mindig a kép fölött legyen */
 }
 
 /* Rács elrendezés a kártyákhoz */
