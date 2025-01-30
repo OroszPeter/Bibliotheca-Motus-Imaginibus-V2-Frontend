@@ -250,7 +250,7 @@ async function removeFromWatchlist() {
             successMessageDiv.style.top = '20px';
             successMessageDiv.style.left = '50%';
             successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'yellow';
+            successMessageDiv.style.backgroundColor = 'orange';
             successMessageDiv.style.border = '1px solid black';
             successMessageDiv.style.color = 'white';
             successMessageDiv.style.padding = '10px 20px';
@@ -353,7 +353,24 @@ async function updateMovie() {
         const updatedMovieData = await response.json();
         movie = updatedMovieData;  // Módosítás után frissítjük a film adatokat
         isEditing = false; // Kilépünk a szerkesztési módból
-        showToast('Film frissítve!', 'success'); // Sikeres üzenet
+         // Sikerüzenet megjelenítése
+         const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Sikeres módosítás!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'blue';
+            successMessageDiv.style.border = '1px solid black';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                            }, 3000);
     } catch (error) {
         console.error('Hiba a film frissítésekor:', error);
         showToast('Hiba történt a frissítéskor!', 'error'); // Hibaüzenet

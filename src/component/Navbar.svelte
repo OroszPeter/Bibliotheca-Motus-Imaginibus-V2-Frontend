@@ -4,14 +4,12 @@
 
   let searchQuery = '';
   const handleSearch = () => {
-    // Átirányítás a keresett kifejezés alapján a result oldalra
     window.location.href = `/result?query=${searchQuery}`;
   };
 
-  $: isUserLoggedIn = $isLoggedIn; // Automatikus frissítés a store alapján
-  $: userName = $userStore.userName || ''; // Felhasználónév figyelése
+  $: isUserLoggedIn = $isLoggedIn;
+  $: userName = $userStore.userName || '';
 
-  // Dinamikusan frissülő menüelemek
   $: menuItems = [
     { name: `Újdonságok`, link: "/", icon: "bi-house" },
     { name: "Filmek", link: "/movies", icon: "bi-film" },
@@ -20,7 +18,6 @@
     ...(isUserLoggedIn
       ? [
           { name: "Kijelentkezés", link: "#logout", icon: "bi-box-arrow-right" },
-          // Ellenőrizzük, hogy a roles létezik-e és hogy az első elem "Admin"
           ...(Array.isArray($userStore.roles) && $userStore.roles[0] === "Admin"
             ? [{ name: "Tartalom hozzáadása", link: "/add-movie", icon: "bi-plus-circle" }]
             : [])
@@ -41,7 +38,6 @@
       });
       isLoggedIn.set(false);
       authToken.set('');
-      // window.location.href = '/login'; // Visszairányítás a bejelentkezéshez
   }
 </script>
 
@@ -49,7 +45,6 @@
 
 
 <div class="navigation">
-  <!-- Navbar -->
   <nav class="navbar navbar-expand navbar-dark bg-danger">
       <div class="container-fluid">
           <a class="navbar-brand px-1" href="#">Bibliotheca Motus Imaginibus</a>
@@ -68,31 +63,20 @@
           <div id="profile" class="text-center">
               {#if isUserLoggedIn}
               <a class="text-white" href="/profile">
-                {#if $isLoggedIn && ($userStore.roles) && $userStore.roles[0] === "Admin"}
-                <span class="neontext">{userName} <i class="bi bi-lightning-charge-fill"></i></span>
-                {:else}
-                <span>{userName}</span>
-                {/if}
+                <i class="bi bi-person-circle"></i>
               </a>
               {/if}
           </div>
       </div>
   </nav>
 
-  <!-- Sidebar -->
   <div class="sidebar bg-dark text-white pt-1">
     <ul class="list-unstyled">
       {#each menuItems as item, i}
-        <li
-          class="py-2 px-3 sidebar-item {i === 0 ? 'first-item' : ''}"
-          on:click={item.link === "#logout" ? handleLogout : null}
-        >
-          <a
-            class="text-white text-decoration-none"
-            href={item.link}
-          >
+        <li class="py-2 px-3 sidebar-item" on:click={item.link === "#logout" ? handleLogout : null}>
+          <a class="text-white text-decoration-none" href={item.link}>
             <i class={`bi ${item.icon}`}></i>
-            {item.name}
+            <span class="menu-text">{item.name}</span>
           </a>
         </li>
       {/each}
@@ -241,6 +225,24 @@
 .sidebar-item i {
   margin-right: 10px; /* Térköz az ikon és a szöveg között */
 }
+@media (max-width: 768px) {
+    .menu-text {
+      display: none;
+    }
+    .navbar-brand {
+      font-size: 1rem;
+    }
+    .search-container {
+      width: 100%;
+    }
+    .sidebar {
+      width: 80px;
+    }
+    .sidebar-item a {
+      display: flex;
+      justify-content: center;
+    }
+  }
   </style>
   
   

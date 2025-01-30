@@ -186,17 +186,35 @@
 </div>
 
 <style>
-    .form-container{
-        position: relative;
-        top: 50%;
-        left: 75%;
-        font-family: 'Roboto', sans-serif;
-        font-size: 0;
-        padding: 0 15px;
-        border: 1px solid #DC2036;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    .form-container {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 400px; /* Ne legyen túl széles nagy kijelzőn */
+    width: 100%;
+    padding: 20px;
+    background: white;
+    border: 1px solid #DC2036;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobilon kisebb eltolás */
+@media (max-width: 576px) {
+    .form-container {
+        left: 60%;
+        transform: translate(-50%);
+        margin-top: 30px; /* 60px eltolás */
+        width: 80%; /* Szélesebb, hogy ne legyen túl kicsi */
     }
+}
+
+@media (min-width: 576px) and (max-width: 1024px) {
+    .form-container {
+        width: 80%; /* Tableten szélesebb, de nem teljes szélesség */
+    }
+}
     .form-container .form-icon{
         color: #fff;
         font-size: 13px;
@@ -318,4 +336,5 @@
             margin: 0;
         }
     }
+
 </style>

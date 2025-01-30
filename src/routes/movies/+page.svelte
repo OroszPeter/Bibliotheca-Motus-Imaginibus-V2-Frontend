@@ -52,8 +52,8 @@
     selectedCategory = category;
   }
 </script>
-
 <style>
+  /* Betöltés animáció */
 .spinner-grow {
   position: absolute;
   top: 50%;
@@ -62,12 +62,26 @@
   height: 50px;
 }
 
+/* Tartalom reszponzív elhelyezése */
 .content {
-  margin-left: 300px;
   padding: 20px;
   color: white;
+  margin-left: 60px; /* Mobilon kisebb eltolás */
 }
 
+@media (min-width: 768px) {
+  .content {
+    margin-left: 100px; /* Tableten nagyobb */
+  }
+}
+
+@media (min-width: 1024px) {
+  .content {
+    margin-left: 300px; /* Nagy képernyőn teljes eltolás */
+  }
+}
+
+/* Kategória gombok */
 .category-button {
   display: inline-block;
   margin-right: 10px;
@@ -89,6 +103,7 @@
   background-color: #555;
 }
 
+/* Kártyák és elrendezés */
 .card {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   background-color: #333333;
@@ -97,7 +112,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%; /* A kártyák egységes magasságának biztosítása */
+  height: 100%;
+  width: 100%;
 }
 
 .card:hover {
@@ -106,31 +122,53 @@
   transition: all 0.3s ease-in-out;
 }
 
+/* Kártya cím */
 .card-title {
   margin-bottom: 5px;
-  font-size: 1rem; /* Egységes betűméret */
-  line-height: 1.2; /* Egyenletes sorok közötti távolság */
-  text-align: center; /* Középre igazítás */
-  word-wrap: break-word; /* Hosszú szavak tördelése */
-  white-space: normal; /* Több soros tördelés engedélyezése */
-  min-height: 3em; /* Legalább két sor hely fenntartása, ékezetek figyelembevételével */
+  font-size: 1rem;
+  line-height: 1.2;
+  text-align: center;
+  word-wrap: break-word;
+  white-space: normal;
+  min-height: 3em;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
 }
 
+/* Kártya belső része */
 .card-body {
-  padding: 10px; /* Egyenletes belső margók */
-  flex-grow: 1; /* A tartalom helykitöltése */
+  padding: 10px;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
+/* Sorok reszponzív elrendezése */
+.row {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(1, 1fr); /* Mobilon 1 oszlop */
+}
+
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: repeat(2, 1fr); /* Tableten 2 oszlop */
+  }
+}
+
+@media (min-width: 1024px) {
+  .row {
+    grid-template-columns: repeat(4, 1fr); /* Nagyobb képernyőn 4 oszlop */
+  }
+}
+
+/* Képek konténer */
 .image-container {
   width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3; /* Képek aránya */
+  aspect-ratio: 2 / 3;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -140,37 +178,53 @@
 .image-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Képarányok megőrzése */
+  object-fit: cover;
+  border-radius: 10px;
 }
 
+/* Képméretek eszközök szerint */
+@media (max-width: 768px) {
+  .image-container {
+    width: 100%;
+    height: 400px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .image-container {
+    width: 100%;
+    height: 350px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .image-container {
+    width: 100%;
+    height: 300px;
+  }
+}
+
+/* Értékelés badge */
 .badge {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffc107;
-    width: 50px;
-    height: 20px;
-    border-radius: 50px;
-    z-index: 1;
-  }
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffc107;
+  width: 50px;
+  height: 20px;
+  border-radius: 50px;
+  z-index: 1;
+}
 
+/* Szövegek */
+small {
+  font-size: 0.875rem;
+  color: white !important;
+}
 
-  .card-body {
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-
-  .card-title {
-    margin-bottom: 5px;
-    color: white;
-  }
-
-  small {
-    font-size: 0.875rem;
-    color: white !important;
-  }
 </style>
+
 
 {#if isLoading}
 <div class="spinner-grow" role="status"></div>

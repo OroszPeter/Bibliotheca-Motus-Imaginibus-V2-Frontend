@@ -1,29 +1,69 @@
-<script></script>
-<div class="form-bg">
-  <div class="container">
+<script>
+    import { API_Url } from '../../store.js';
+    import { onMount } from 'svelte';
+    import { push } from 'svelte-spa-router'; // Ha SPA routingot használsz
+  
+    let email = '';
+  
+    async function handleForgotPassword() {
+      const url = `${API_Url}Account/forget-password`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+  
+      if (response.ok) {
+        const data = await response.text();
+        const successMessageDiv = document.createElement('div');
+            successMessageDiv.textContent = 'Visszaállító email elküldve!';
+            successMessageDiv.style.position = 'fixed';
+            successMessageDiv.style.top = '20px';
+            successMessageDiv.style.left = '50%';
+            successMessageDiv.style.transform = 'translateX(-50%)';
+            successMessageDiv.style.backgroundColor = 'green';
+            successMessageDiv.style.border = '1px solid black';
+            successMessageDiv.style.color = 'white';
+            successMessageDiv.style.padding = '10px 20px';
+            successMessageDiv.style.borderRadius = '5px';
+            successMessageDiv.style.zIndex = '1000';
+            document.body.appendChild(successMessageDiv);
+
+            setTimeout(() => {
+                successMessageDiv.remove();
+                window.location.href = "/login";
+                            }, 3000);
+        
+      } else {
+        const errorData = await response.text();
+      }
+    }
+  </script>
+  
+  <div class="form-bg">
+    <div class="container">
       <div class="row">
-          <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
-              <div class="form-container bg-danger">
-                <form class="form-horizontal form-right" >
-                <h3 class="title">Elfelejtett jelszó</h3>
-                <div class="form-group">
-                    <span class="input-icon"><i class="bi bi-envelope-fill"></i></span>
-                    <input class="form-control" type="email" placeholder="E-mail cím">
-                </div>
-                <button id="login" class="btn signin bg-danger">Küldés</button>
-                <span class="info">
-                    Fontos hogy a felhasználódhoz tartozó érvényes email címedet add meg.
-                </span>
-                </form>
-              </div>
+        <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
+          <div class="form-container p-5 bg-danger">
+            <h3 class="title text-white">Elfelejtett jelszó</h3>
+            <div class="form-group">
+              <span class="input-icon"><i class="bi bi-envelope-fill"></i></span>
+              <input class="form-control" type="email" placeholder="E-mail cím" bind:value={email}>
+            </div>
+            <button id="login" class="btn signin mt-3" on:click={handleForgotPassword}>Küldés</button>
+            <span class="info text-dark">
+              Fontos, hogy a felhasználódhoz tartozó érvényes email címedet add meg.
+            </span>
           </div>
+        </div>
       </div>
+    </div>
   </div>
-</div>
   
 <style>
-  .info{
-      color: black;}
+
       .form-container {
     position: absolute; /* A formot az ablakhoz igazítjuk */
     top: 50%; /* Függőlegesen középre */
@@ -36,6 +76,15 @@
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     background-color: #fff; /* Biztosítja, hogy a háttér ne legyen átlátszó */
+}
+.btn{
+    color: black;
+    background-color: whitesmoke;
+    width: 100%;
+}
+.btn:hover{
+    color: gray;
+    background-color: wheat;
 }
   .form-container .form-icon{
       color: #fff;
@@ -76,86 +125,29 @@
       letter-spacing: 0.5px;
       margin: 0 0 30px 0;
   }
-  .form-horizontal .form-group{
-      background-color: rgba(255,255,255,0.15);
-      margin: 0 0 15px;
-      border: 1px solid #b5b5b5;
-      border-radius: 20px;
-  }
-  .form-horizontal .input-icon{
-      color: #b5b5b5;
-      font-size: 15px;
-      text-align: center;
-      line-height: 38px;
-      height: 35px;
-      width: 40px;
-      vertical-align: top;
-      display: inline-block;
-  }
-  .form-horizontal .form-control{
-      color: #b5b5b5;
-      background-color: transparent;
-      font-size: 14px;
-      letter-spacing: 1px;
-      width: calc(100% - 55px);
-      height: 33px;
-      padding: 2px 10px 0 0;
-      box-shadow: none;
-      border: none;
-      border-radius: 0;
-      display: inline-block;
-      transition: all 0.3s;
-  }
-  .form-horizontal .form-control:focus{
-      box-shadow: none;
-      border: none;
-  }
-  .form-horizontal .form-control::placeholder{
-      color: #b5b5b5;
-      font-size: 13px;
-      text-transform: capitalize;
-  }
-  .form-horizontal .btn{
-      color: rgba(255,255,255,0.8);
-      background: #E9374C;
-      font-size: 15px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      width: 100%;
-      margin: 0 0 10px 0;
-      border: none;
-      border-radius: 20px;
-      transition: all 0.3s ease;
-  }
-  .form-horizontal .btn:hover,
-  .form-horizontal .btn:focus{
-      color: #fff;
-      background-color: #D31128;
-      box-shadow: 0 0 5px rgba(0,0,0,0.5);
-  }
-  .form-horizontal .forgot-pass{
-      font-size: 12px;
-      text-align: center;
-      display: block;
-  }
-  .form-horizontal .forgot-pass a{
-      color: #999;
-      transition: all 0.3s ease;
-  }
-  .form-horizontal .forgot-pass a:hover{
-      color: #777;
-      text-decoration: underline;
-  }
   @media only screen and (max-width:576px){
       .form-container{ padding-bottom: 15px; }
       .form-container .form-icon{
           width: 100%;
           padding: 20px 0;
       }
-      .form-container .form-horizontal{
-          width: 100%;
-          margin: 0;
-      }
   }
+  .form-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: gray;
+}
+
+.form-control {
+    padding-left: 35px; /* Helyet hagyunk az ikon számára */
+    height: 40px;
+}
 </style>

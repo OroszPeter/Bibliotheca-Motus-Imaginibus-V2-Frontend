@@ -40,6 +40,9 @@
 	},
 	"dependencies": {
 		"@sveltejs/adapter-netlify": "^4.4.0",
-		"node-fetch": "^3.3.2"
+		"node-fetch": "^3.3.2",
+		"svelte-spa-router": "^4.0.1",
+		"svelte-toast": "^1.0.0",
+		"svelte-toastify": "^0.0.27"
 	}
 }
