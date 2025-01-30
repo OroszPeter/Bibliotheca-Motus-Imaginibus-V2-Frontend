@@ -148,129 +148,123 @@
 {/if}
 
 <style>
-  /* Import Google font - Poppins */
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+    /* Import Google font - Poppins */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
-  .bi{
-    color: white;
-  }
+.bi {
+  color: white;
+}
 
-  body {
-    display: flex;
-    padding: 0 35px;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: center;
-    background: #343F4F;
-  }
+body {
+  display: flex;
+  padding: 0 20px;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: #343F4F;
+}
 
+.content {
+  padding: 20px;
+  color: white;
+  margin-left: 60px; /* Mobilon kisebb eltolás */
+}
+
+@media (min-width: 768px) {
   .content {
-    margin-left: 300px; /* Sidebar szélességének megfelelő eltolás */
-    padding: 20px; /* Extra belső tér a tartalom körül */
-    color: white; /* Alapértelmezett fehér szín a szövegekhez */
+    margin-left: 100px; /* Tableten nagyobb */
   }
+}
 
-  .wrapper {
-    position: relative;
-
+@media (min-width: 1024px) {
+  .content {
+    margin-left: 300px; /* Nagy képernyőn teljes eltolás */
   }
+}
 
-  .wrapper i {
-    top: 50%;
-    height: 44px;
-    width: 44px;
-    color: #343F4F;
-    cursor: pointer;
-    font-size: 1.15rem;
-    position: absolute;
-    text-align: center;
-    line-height: 44px;
-    background: #fff;
-    border-radius: 50%;
-    transform: translateY(-50%);
-    transition: transform 0.1s linear;
-    z-index: 100;
-  }
+.wrapper {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
 
-  .wrapper i:active {
-    transform: translateY(-50%) scale(0.9);
-  }
-
-  .wrapper i:hover {
-    background: #f2f2f2;
-  }
-
-  .wrapper i:first-child {
-    left: -22px;
-  }
-
-  .wrapper i:last-child {
-    right: -22px;
-  }
-
-  .wrapper .carousel {
-    font-size: 0px;
-    cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    scroll-behavior: smooth;
-  }
-
-  #left, #right{
-    z-index: 100;
-    color: white;
-  }
-
-  .carousel.dragging {
-    cursor: grab;
-    scroll-behavior: auto;
-  }
-
-  .carousel.dragging img {
-    pointer-events: none;
-  }
-
-  .carousel img {
-    height: 100%;
-    object-fit: cover;
-    user-select: none;
-    margin-left: 14px;
-    width: calc(100% / 3);
-  }
-
-  .carousel img:first-child {
-    margin-left: 0px;
-  }
-
-  .movie-item {
-  display: inline-block;
-  width: 200px;
-  margin-right: 14px;
+.wrapper i {
+  position: absolute;
+  top: 50%;
+  height: 44px;
+  width: 44px;
+  color: #343F4F;
+  cursor: pointer;
+  font-size: 1.15rem;
   text-align: center;
-  vertical-align: top; /* Győződjünk meg arról, hogy az elemek függőlegesen egy vonalban vannak */
+  line-height: 44px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.1s linear;
+  z-index: 100;
+}
+
+.wrapper i:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.wrapper i:hover {
+  background: #f2f2f2;
+}
+
+.wrapper i:first-child {
+  left: -22px;
+}
+
+.wrapper i:last-child {
+  right: -22px;
+}
+
+.carousel {
+  display: flex;
+  gap: 14px;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+}
+
+.carousel.dragging {
+  cursor: grab;
+  scroll-behavior: auto;
+}
+
+.carousel.dragging img {
+  pointer-events: none;
+}
+
+.movie-item {
+  flex: 0 0 calc(100% / 3);
+  text-align: center;
+  width: 100px;
 }
 
 .movie-item img {
   width: 100%;
-  height: auto; /* Az eredeti arányok megtartása */
-  object-fit: cover; /* Biztosítja, hogy a képek megfelelően legyenek kitöltve */
-  display: block; /* Blokk szintű elem, hogy pontosabban illeszkedjen */
-  margin-bottom: 10px; /* Hézag a kép és a cím között */
+  object-fit: cover;
+  display: block;
+  margin-bottom: 10px;
 }
 
 .movie-info {
-  text-align: center; /* Címek középre igazítása */
-  word-wrap: break-word; /* Hosszú szöveg tördelése */
-  overflow: hidden; /* Elrejtjük a szöveg túlfolyását */
-  text-overflow: ellipsis; /* Három ponttal jelöljük a túl hosszú szöveget */
-  white-space: normal; /* Többsoros cím megjelenítése */
+  text-align: center;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
 
 .movie-info h3 {
@@ -283,16 +277,21 @@
   margin: 0;
 }
 
+/* Reszponzív beállítások */
+@media screen and (max-width: 900px) {
+  .movie-item {
+    flex: 0 0 calc(100% / 2);
+  }
+}
 
-  @media screen and (max-width: 900px) {
-    .carousel img {
-      width: calc(100% / 2);
-    }
+@media screen and (max-width: 550px) {
+  .movie-item {
+    flex: 0 0 100%;
   }
 
-  @media screen and (max-width: 550px) {
-    .carousel img {
-      width: 100%;
-    }
+  .wrapper i {
+    display: block;
   }
+}
+
 </style>

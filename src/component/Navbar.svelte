@@ -47,7 +47,10 @@
 <div class="navigation">
   <nav class="navbar navbar-expand navbar-dark bg-danger">
       <div class="container-fluid">
-          <a class="navbar-brand px-1" href="#">Bibliotheca Motus Imaginibus</a>
+        <a class="navbar-brand px-1" href="#">
+          <span class="full-name">Bibliotheca Motus Imaginibus</span>
+          <span class="short-name">BMI</span>
+      </a>
           <div class="search-container d-flex align-items-center w-75">
               <input
                   class="form-control custom-search"
@@ -91,6 +94,18 @@
 </div>
   
   <style>
+    .short-name {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .full-name {
+    display: none;
+  }
+  .short-name {
+    display: inline;
+  }
+}
     .neontext {
   color: #fff;
   text-shadow:
