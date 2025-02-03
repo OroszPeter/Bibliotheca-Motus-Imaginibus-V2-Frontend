@@ -105,6 +105,12 @@
   .short-name {
     display: inline;
   }
+  .navbar-brand {
+    width: 60px;
+  }
+  #profile{
+    width: 100px;
+  }
 }
     .neontext {
   color: #fff;
@@ -123,16 +129,19 @@
       display: flex;
       flex-direction: column;
     }
-    #profile{
-      width: 275px;
-    }
+    
     #profile>a{
       text-decoration: none;
     }
-  
+
+  @media (min-width: 1024px) {
     .navbar-brand {
       width: 300px;
+    } 
+    #profile{
+      width: 275px;
     }
+  }
   
     /* Search container styles */
     .search-container {
