@@ -2,13 +2,12 @@
   import { goto } from "$app/navigation";
   import { isLoggedIn, userStore, authToken } from "../../store.js";
   import { onMount } from "svelte";
-  import { writable } from "svelte/store";
-    let isDragStart = false, isDragging = false, prevPageX, prevScrollLeft, positionDiff;
-    const moveCarousel = (direction) => {
-      const firstImgWidth = carousel.querySelector("img").clientWidth + 14;
-      carousel.scrollLeft += direction === 'left' ? -firstImgWidth : firstImgWidth;
-      setTimeout(updateIcons, 60);
-    }
+  import { writable, get } from "svelte/store";
+
+  let isDragStart = false, isDragging = false, prevPageX, prevScrollLeft, positionDiff;
+  let movies = writable([]);
+  let showLeftIcon = false, showRightIcon = true;
+  let carousel;
   
     const autoSlide = () => {
       if (carousel.scrollLeft - (carousel.scrollWidth - carousel.clientWidth) > -1 || carousel.scrollLeft <= 0) return;
@@ -48,30 +47,28 @@
       isDragging = false;
       autoSlide();
     }
-    function Goto() {
-      window.location.href = "/login";
-    }
 
-  let movies = writable([]); // A filmek adatainak tárolása
-  let showLeftIcon = false, showRightIcon = true;
-  let carousel;
-
-  // API URL és egyéb szükséges adat
   const API_Url = "https://bmiwebapi.tryasp.net/api/";
+
+  const moveCarousel = (direction) => {
+    const firstImgWidth = carousel.querySelector("img").clientWidth + 14;
+    carousel.scrollLeft += direction === 'left' ? -firstImgWidth : firstImgWidth;
+    setTimeout(updateIcons, 60);
+  };
 
   const updateIcons = () => {
     const scrollWidth = carousel.scrollWidth - carousel.clientWidth;
     showLeftIcon = carousel.scrollLeft === 0 ? false : true;
     showRightIcon = carousel.scrollLeft === scrollWidth ? false : true;
-  }
+  };
 
-  // Kérés a watchlisthez és a movie adatokhoz
   const fetchWatchlist = async () => {
-    const token = $authToken.token;
-    const userId = $userStore.id;
+    const token = get(authToken).token;
+    const userId = get(userStore).id; 
     
-    // GET kérés a /Watchlist végpontra
-    const response = await fetch(`${API_Url}Watchlist?userId=${userId}`, {
+    if (!userId) return;
+
+    const response = await fetch(`${API_Url}Watchlist`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -79,18 +76,17 @@
     
     if (response.ok) {
       const watchlist = await response.json();
-      
-      // A watchlist-ben lévő movieId-k listájának feldolgozása
-      const movieDetails = await Promise.all(watchlist.map(async (item) => {
-        const movieId = item.movieId; // Csak a movieId-t használjuk
+      const userWatchlist = watchlist.filter(item => item.userId === userId); // Szűrés a bejelentkezett felhasználóra
+
+      const movieDetails = await Promise.all(userWatchlist.map(async (item) => {
+        const movieId = item.movieId;
         const movieResponse = await fetch(`${API_Url}movie/${movieId}`);
         const movieData = await movieResponse.json();
-        
-        // Kép lekérése a movie-hoz
+
         const imageResponse = await fetch(`${API_Url}movie/${movieId}/kep`);
         const imageBlob = await imageResponse.blob();
         const imageUrl = URL.createObjectURL(imageBlob);
-        
+
         return {
           id: movieData.id,
           title: movieData.title,
@@ -99,17 +95,20 @@
         };
       }));
       
-      // Filmek adatainak beállítása
       movies.set(movieDetails);
     }
   };
-    // Kattintás esemény a filmre, ami átirányít a film oldalra
-    const handleMovieClick = (movieId) => {
+
+  const handleMovieClick = (movieId) => {
     goto(`/movies/${movieId}`);
   };
 
+  function Goto() {
+    window.location.href = "/login";
+  }
+
   onMount(() => {
-    if ($isLoggedIn) {
+    if (get(isLoggedIn)) {
       fetchWatchlist();
     }
   });
@@ -124,12 +123,12 @@
         <div class="carousel" bind:this={carousel} on:mousedown={dragStart} on:touchstart={dragStart} on:mousemove={dragging} on:touchmove={dragging} on:mouseup={dragStop} on:touchend={dragStop}>
           {#each $movies as movie (movie.id)}
           <div class="movie-item" on:click={() => handleMovieClick(movie.id)}>
-              <img src={movie.imageUrl} alt={movie.title} draggable="false">
-              <div class="movie-info">
-                <h3>{movie.title}</h3>
-                <p>{movie.genre}</p>
-              </div>
+            <img src={movie.imageUrl} alt={movie.title} draggable="false">
+            <div class="movie-info">
+              <h3>{movie.title}</h3>
+              <p>{movie.genre}</p>
             </div>
+          </div>
           {/each}
         </div>
         <i id="right" class="bi bi-arrow-right bg-danger" on:click={() => moveCarousel('right')} style="display: {showRightIcon ? 'block' : 'none'}"></i>
@@ -146,6 +145,7 @@
     </div>
   </div>
 {/if}
+
 
 <style>
     /* Import Google font - Poppins */
