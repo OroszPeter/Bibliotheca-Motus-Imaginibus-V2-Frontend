@@ -175,7 +175,7 @@
                             </div>
                             <button id="login" class="btn signin bg-danger">Bejelentkezés</button>
                             <span class="forgot-pass">
-                                <a href="#">Elfelejtetted a Felhasználóneved/Jelszavad?</a>
+                                <a href="/reset-password">Elfelejtetted a jelszavad?</a>
                             </span>
                         </form>
                     {/if}
@@ -331,7 +331,7 @@
         .form-container{ padding-bottom: 15px; }
         .form-container .form-icon{
             width: 100%;
-            /* padding: 20px 0; */
+            padding: 20px 0;
         }
         .form-container .form-horizontal{
             width: 100%;

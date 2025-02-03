@@ -63,9 +63,28 @@
   </div>
   
 <style>
+  /* Tartalom reszponzív elhelyezése */
+.container {
+  padding: 20px;
+  color: white;
+  margin-left: 100px; /* Mobilon kisebb eltolás */
+}
+
+@media (min-width: 768px) {
+  .container {
+    margin-left: 100px; /* Tableten nagyobb */
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    margin-left: 300px; /* Nagy képernyőn teljes eltolás */
+  }
+}
 
       .form-container {
-    position: absolute; /* A formot az ablakhoz igazítjuk */
+    position: relative; /* A formot az ablakhoz igazítjuk */
+    margin-top: 50px;
     top: 50%; /* Függőlegesen középre */
     left: 50%; /* Vízszintesen középre */
     transform: translate(-50%, -50%); /* Pontosan középre tolás */
