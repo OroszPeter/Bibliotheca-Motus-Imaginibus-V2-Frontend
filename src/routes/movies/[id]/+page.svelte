@@ -524,7 +524,7 @@ function showToast(message, type) {
                                         </label>
                                     {/each}
                                 </div>
-                                <textarea bind:value={comment} name="komment" cols="75" rows="4" id="comment"></textarea><br>
+                                <textarea bind:value={comment} name="komment" id="comment"></textarea>
                                 <button id="send" class="btn btn-success" on:click={submitRating}>Küldés</button>
                             </div>
                         </td>
@@ -636,10 +636,150 @@ function showToast(message, type) {
     .star + .star {
         margin-left: 2px;
     }
+    .p {
+        border: 1px solid black;
+    }
+    #login {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border: 1px solid black;
+        padding: 10px;
+        border-radius: 10px;
+        height: 100%;
+        background-color: #dc3545;
+    }
+    #login h5 {
+        margin-bottom: 20px;
+    }
+    #login .btn {
+        padding: 10px 20px;
+        color: white;
+    }
+    #login .btn:hover {
+        color: orange;
+    }
+    .container {
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+        color: white;
+        margin-top: 25px;
+        max-width: 90%;
+    }
+    .ratings-section {
+        margin-top: 20px;
+    }
+    .rating {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+    }
+    .rating p {
+        margin: 0;
+        color: #ddd;
+    }
+    .picture,
+    .content,
+    .people {
+        padding: 10px;
+    }
+    .star {
+        font-size: 2.0rem;
+        color: gold;
+        cursor: pointer;
+    }
+    .star + .star {
+        margin-left: 2px;
+    }
     img {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+    }
+    .desc {
+        width: 100%;
+    }
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        transform: translateY(-20px);
+    }
+    .toast.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .toast.success {
+        background-color: #28a745;
+    }
+    .toast.error {
+        background-color: #dc3545;
+    }
+    
+    /* Reszponzivitás kisebb eszközökre */
+    @media (max-width: 768px) {
+        .container {
+            margin-left: 60px;
+        }
+        table {
+            display: block;
+        }
+        tbody,
+        tr {
+            display: block;
+            width: 100%;
+        }
+        td {
+            display: block;
+            width: 100%;
+        }
+        .people,
+        .desc,
+        .comment {
+            width: 100%;
+        }
+        .picture {
+            text-align: center;
+        }
+        .picture img {
+            max-width: 100%;
+        }
+    }
+    #comment {
+    width: 100%; /* A szülőelem teljes szélességét kihasználja */
+    max-width: 700px; /* Nagy képernyőn ne legyen túl széles */
+    min-width: 250px; /* Ne legyen túl keskeny */
+    height: auto;
+    min-height: 100px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical; /* Engedi a méretállítást függőlegesen */
+}
+
+/* Mobilbarát beállítások */
+@media (max-width: 768px) {
+    #comment {
+        width: 100%; /* Mobilon a teljes szélességet kitölti */
+        min-width: unset;
+    }
+}
+    @media (min-width: 1024px) {
+        img {
         width: 400px;
         height: 700px;
     }
+    }
+    
     .desc {
         width: 300px;
     }
@@ -664,4 +804,10 @@ function showToast(message, type) {
     .toast.error {
         background-color: #dc3545;
     }
+    @media (min-width: 1024px) {
+    .container {
+        margin-left: 300px;
+        max-width: 80%; /* Szélesebb tartomány engedése */
+    }
+}
 </style>

@@ -79,7 +79,7 @@
       </div>
   </nav>
 
-  <div class="sidebar bg-dark text-white pt-1">
+  <div class="sidebar bg-dark text-white pt-1 h-100">
     <ul class="list-unstyled">
       {#each menuItems as item, i}
         <li class="py-2 px-3 sidebar-item" on:click={item.link === "#logout" ? handleLogout : null}>

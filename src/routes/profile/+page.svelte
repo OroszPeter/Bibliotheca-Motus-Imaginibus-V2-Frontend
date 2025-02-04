@@ -17,6 +17,8 @@
     let newEmail = '';
     let oldPassword = '';
     let newPassword = '';
+    let showCurrentPassword = false;
+    let showNewPassword = false;
 
     // PUT kérés küldése API végpontra
     async function updateUserData(endpoint, payload) {
@@ -138,6 +140,14 @@
         console.error('Hálózati hiba:', error);
     }
 }
+    // Jelszó láthatóságának kezelése
+    function toggleCurrentPasswordVisibility() {
+        showCurrentPassword = !showCurrentPassword;
+    }
+
+    function toggleNewPasswordVisibility() {
+        showNewPassword = !showNewPassword;
+    }
 </script>
 
 <div class="form-bg">
@@ -167,11 +177,67 @@
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-unlock-fill"></i></span>
-                                <input class="form-control" type="password" placeholder="Régi jelszó" bind:value={oldPassword}>
+                                {#if showCurrentPassword}
+                        <!-- Szöveges mező a jelszó helyett -->
+                        <input
+                            type="text"
+                            class="form-control current-password"
+                            id="currentPassword"
+                            bind:value={oldPassword}
+                            placeholder="Jelenlegi jelszó"
+                            required
+                        />
+                    {:else}
+                        <!-- Jelszó mező -->
+                        <input
+                            type="password"
+                            class="form-control current-password"
+                            id="currentPassword"
+                            bind:value={oldPassword}
+                            placeholder="Jelenlegi jelszó"
+                            required
+                        />
+                    {/if}
+                    <button type="button" class="btn btn-outline-secondary text-secondary" on:click={toggleCurrentPasswordVisibility}>
+                        {#if showCurrentPassword}
+                            <i class="bi bi-eye-fill"></i>
+                        {:else}
+                            <i class="bi bi-eye-slash-fill"></i>
+                        {/if}
+                    </button>
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-lock-fill"></i></span>
-                                <input class="form-control" type="password" placeholder="Új jelszó" bind:value={newPassword}>
+                                {#if showNewPassword}
+                        <!-- Szöveges mező az új jelszó helyett -->
+                        <input
+                            type="text"
+                            class="form-control new-password"
+                            id="newPassword"
+                            bind:value={newPassword}
+                            placeholder="Új jelszó"
+                            required
+                        />
+                    {:else}
+                        <!-- Jelszó mező -->
+                        <input
+                            type="password"
+                            class="form-control new-password"
+                            id="newPassword"
+                            bind:value={newPassword}
+                            placeholder="Új jelszó"
+                            required
+                        />
+                    {/if}
+                    <span>
+                    <button type="button" class="btn btn-outline-secondary text-secondary" on:click={toggleNewPasswordVisibility}>
+                        {#if showNewPassword}
+                            <i class="bi bi-eye-fill"></i>
+                        {:else}
+                            <i class="bi bi-eye-slash-fill"></i>
+                        {/if}
+                    </button>
+                    </span>
                             </div>
                             <button class="btn signin bg-danger" type="submit">Módosít</button>
                         </form>
@@ -305,16 +371,17 @@
     }
     .form-horizontal .btn{
         color: rgba(255,255,255,0.8);
-        background: #E9374C;
         font-size: 15px;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 1px;
-        width: 100%;
         margin: 0 0 10px 0;
         border: none;
         border-radius: 20px;
         transition: all 0.3s ease;
+    }
+    .signin{
+        width: 100%;
     }
     .form-horizontal .btn:hover,
     .form-horizontal .btn:focus{
@@ -346,4 +413,15 @@
             margin: 0;
         }
     }
+    .form-group{
+        display: flex;
+    }
+    .btn-outline-secondary {
+        border-radius: 0 4px 4px 0;
+        background-color: white;
+        color: #454545;
+        width: 35px;
+        height: 35px;
+    }
+
 </style>
