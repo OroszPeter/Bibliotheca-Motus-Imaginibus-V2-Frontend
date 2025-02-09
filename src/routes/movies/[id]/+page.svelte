@@ -13,6 +13,7 @@
     let users = {}; // User ID -> username tárolás
     let releasedYear = new Date(movie.releasedDate).getFullYear();
     let isAtWatchlist = false;
+    let fileInput;
 
     function toLogin() {
         window.location.href = "/login";
@@ -314,6 +315,35 @@ function toggleEdit() {
     isEditing = !isEditing;
 }
 
+async function uploadImage(filmId) {
+    if (!fileInput || !fileInput.files.length) {
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    console.log("PUT kérés a kép feltöltéséhez, filmId:", filmId);
+
+    try {
+      const response = await fetch(`${API_Url}Movie/${filmId}/kep`, {
+        method: 'PUT',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Hiba a válaszban:", errorResponse);
+        throw new Error("Hiba a kép feltöltésekor");
+      }
+
+      console.log("A kép sikeresen feltöltve");
+    } catch (error) {
+      console.error("Hiba:", error);
+    }
+  }
+
 async function updateMovie() {
     const token = getStoreValue(authToken)?.token;
     const userId = getStoreValue(userStore)?.id;
@@ -352,6 +382,7 @@ async function updateMovie() {
 
         const updatedMovieData = await response.json();
         movie = updatedMovieData;  // Módosítás után frissítjük a film adatokat
+        await uploadImage(movie.id);
         isEditing = false; // Kilépünk a szerkesztési módból
          // Sikerüzenet megjelenítése
          const successMessageDiv = document.createElement('div');
@@ -413,31 +444,43 @@ function showToast(message, type) {
 </script>
 
 <main>
+  <!-- Modal -->
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-secondary">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Tartalom szerkesztése</h1>
+        </div>
+        <div class="modal-body">
+            <div class=" w-75">
+                <input type="text" bind:value={movie.title} class="form-control mt-1" />
+                <input type="text" bind:value={movie.releasedDate} class="form-control mt-1" />
+                <input type="text" bind:value={movie.genre} class="form-control mt-1" />
+                <input type="text" bind:value={movie.length} class="form-control mt-1" />
+                {#if movie.isSeries}
+                <input type="text" bind:value={movie.numberOfSeasons} class="form-control mt-1" />
+                <input type="text" bind:value={movie.numberOfEpisodes} class="form-control mt-1" />
+                {/if}
+                <textarea bind:value={movie.description} class="form-control mt-1"></textarea>
+                <input type="text" bind:value={movie.director} class="form-control mt-1" />
+                <input type="text" bind:value={movie.actor1} class="form-control mt-1" />
+                <input type="text" bind:value={movie.actor2} class="form-control mt-1" />
+                <input type="text" bind:value={movie.actor3} class="form-control mt-1" />
+                <input type="file" bind:this={fileInput} class="form-controll mt-1"/>
+                <!-- További mezők is hasonló módon -->
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" on:click={toggleEdit}>Mégse</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" on:click={updateMovie}>Szerkesztés</button>
+        </div>
+      </div>
+    </div>
+  </div>
     {#if isLoading}
         <div>Betöltés...</div>
     {:else if movie}
-        {#if isEditing}
-        <div class="container pt-5 w-75">
-            <h2>Szerkesztés</h2>
-            <input type="text" bind:value={movie.title} class="form-control" />
-            <input type="text" bind:value={movie.releasedDate} class="form-control" />
-            <input type="text" bind:value={movie.genre} class="form-control" />
-            <input type="text" bind:value={movie.length} class="form-control" />
-            {#if movie.isSeries}
-            <input type="text" bind:value={movie.numberOfSeasons} class="form-control" />
-            <input type="text" bind:value={movie.numberOfEpisodes} class="form-control" />
-            {/if}
-            <textarea bind:value={movie.description} class="form-control"></textarea>
-            <input type="text" bind:value={movie.director} class="form-control" />
-            <input type="text" bind:value={movie.actor1} class="form-control" />
-            <input type="text" bind:value={movie.actor2} class="form-control" />
-            <input type="text" bind:value={movie.actor3} class="form-control" />
-            <button class="btn btn-success btn-sm ms-2 mt-2" on:click={updateMovie}>Szerkesztés</button>
-            <button class="btn btn-danger btn-sm ms-2 mt-2" on:click={toggleEdit}>Mégse </button>
-            <!-- További mezők is hasonló módon -->
-        </div>
-        {:else}
-        {/if}
+
         <div class="container pt-5 w-75">
             <table class="pt-5">
                 <tbody>
@@ -465,7 +508,7 @@ function showToast(message, type) {
                                     {#if $isLoggedIn && $userStore.roles && $userStore.roles[0] === "Admin"}
                                         {#if isEditing}
                                         {:else}
-                                        <button class="btn btn-success btn-sm ms-2" on:click={toggleEdit}><i class="bi bi-pencil"></i></button>
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" on:click={toggleEdit}><i class="bi bi-pencil" title="Szerkesztés"></i></button>
                                         {/if}
     {/if}
                                     {/if}
@@ -577,6 +620,12 @@ function showToast(message, type) {
 
 
 <style>
+    .modal-content{
+        border: 3px solid black;
+    }
+    input, textarea{
+        field-sizing: content;
+    }
     .p{
         border: 1px solid black;
     }
