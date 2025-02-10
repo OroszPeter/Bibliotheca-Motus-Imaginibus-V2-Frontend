@@ -14,6 +14,78 @@
     let releasedYear = new Date(movie.releasedDate).getFullYear();
     let isAtWatchlist = false;
     let fileInput;
+let editingId = null;
+
+let editingCommentId = null;
+let editedComment = '';
+let editedRating = 0;
+
+function startEditing(rating) {
+    editingCommentId = rating.id;
+    editedComment = rating.comment;
+    editedRating = rating.ratingNumber;
+
+    // Erőltetett állapotfrissítés Svelte számára
+    editingCommentId = editingCommentId;
+}
+
+async function saveEditedComment(rating) {
+    const token = getStoreValue(authToken)?.token;
+    const userId = getStoreValue(userStore)?.id;
+    
+    if (!token || rating.userId !== userId) {
+        return;
+    }
+
+    const updatedRating = {
+        movieId: movie.id,
+        ratingNumber: editedRating,
+        userId: rating.userId,
+        comment: editedComment
+    };
+
+    try {
+        const response = await fetch(`${API_Url}Ratings/${rating.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedRating)
+        });
+
+        if (!response.ok) throw new Error(`Hiba a módosításkor: ${response.status} ${response.statusText}`);
+
+        // Ellenőrizzük, hogy van-e válasz tartalom
+        let updatedRatingResponse = null;
+        const text = await response.text();
+        if (text) {
+            updatedRatingResponse = JSON.parse(text);
+        }
+
+        // Ha kaptunk választ, frissítsük az állapotot
+        if (updatedRatingResponse) {
+            movieRatings = movieRatings.map(r => r.id === rating.id ? updatedRatingResponse : r);
+        }
+
+        // Visszaállítjuk az állapotot
+        editingCommentId = null;
+        editedComment = '';
+        editedRating = 0;
+    } catch (error) {
+        console.error('Hiba a komment módosításakor:', error);
+    }
+}
+
+
+function cancelEdit() {
+    editingCommentId = null;
+    editedComment = '';
+    editedRating = 0;
+
+    // Állapotfrissítés kikényszerítése
+    editingCommentId = editingCommentId;
+}
 
     function toLogin() {
         window.location.href = "/login";
@@ -445,11 +517,11 @@ function showToast(message, type) {
 
 <main>
   <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal fade pt-5" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content bg-secondary">
+      <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Tartalom szerkesztése</h1>
+          <h1 class="modal-title text-white fs-5" id="staticBackdropLabel">Tartalom szerkesztése</h1>
         </div>
         <div class="modal-body">
             <div class=" w-75">
@@ -584,7 +656,7 @@ function showToast(message, type) {
                         <td colspan="2">
                             <div class="ratings-section">
                                 <h3>Értékelések:</h3>
-                                {#each movieRatings as rating}
+                                {#each movieRatings as rating (rating.id)}
                                     <div class="rating">
                                         <div>
                                             {#each Array(rating.ratingNumber).fill('★') as _}
@@ -593,17 +665,29 @@ function showToast(message, type) {
                                             {#each Array(5 - rating.ratingNumber).fill('☆') as _}
                                                 <span class="star">☆</span>
                                             {/each}
-                                            <p>
-                                                <strong>{users[rating.userId] || 'Ismeretlen felhasználó'}</strong>: 
-                                                {rating.comment}
-                                            </p>
+                            
+                                            {#if editingCommentId === rating.id}
+                                                <br>
+                                                <textarea class="w-75" bind:value={editedComment}></textarea><br>
+                                                <button class="btn btn-success" on:click={() => saveEditedComment(rating)}>Mentés</button>
+                                                <button class="btn btn-secondary" on:click={() => cancelEdit()}>Mégse</button>
+                                            {:else}
+                                                <p>
+                                                    <strong>{users[rating.userId] || 'Ismeretlen felhasználó'}</strong>: 
+                                                    {rating.comment}
+                                                </p>
+                                            {/if}
                                         </div>
+                            
                                         {#if getStoreValue(userStore)?.id === rating.userId}
-                                            <button class="btn btn-danger" on:click={() => deleteRating(rating.id)}>Törlés</button>
+                                            {#if editingCommentId !== rating.id}
+                                                <button class="btn text-danger" on:click={() => deleteRating(rating.id)}>Törlés</button>
+                                                <button class="btn text-warning" on:click={() => startEditing(rating)}>Szerkesztés</button>
+                                            {/if}
                                         {/if}
                                     </div>
                                 {/each}
-                            </div>
+                            </div>                            
                         </td>
                     </tr>
                 </tbody>
@@ -612,16 +696,14 @@ function showToast(message, type) {
     {:else}
         <div>Nem található a film adata.</div>
     {/if}
-
-    <div class="toast" class:success={toast.type === 'success'} class:error={toast.type === 'error'} class:visible={toast.visible}>
-        {toast.message}
-    </div>
 </main>
 
 
 <style>
     .modal-content{
         border: 3px solid black;
+        background-color: #333;
+        opacity: 0.9;
     }
     input, textarea{
         field-sizing: content;

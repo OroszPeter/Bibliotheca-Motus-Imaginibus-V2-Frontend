@@ -131,7 +131,7 @@
 
 .image-container img {
   width: 100%;
-  height: 300px;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -226,7 +226,6 @@ small {
   font-size: 0.875rem;
   color: white !important;
 }
-
 </style>
 
 {#if isLoading}
