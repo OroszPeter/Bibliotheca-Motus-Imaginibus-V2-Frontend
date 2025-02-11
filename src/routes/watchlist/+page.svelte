@@ -192,7 +192,7 @@ body {
 .wrapper {
   position: relative;
   max-width: 100%;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .wrapper i {
@@ -262,7 +262,7 @@ body {
 .movie-info {
   text-align: center;
   word-wrap: break-word;
-  overflow: hidden;
+  /* overflow: hidden; */
   text-overflow: ellipsis;
   white-space: normal;
 }

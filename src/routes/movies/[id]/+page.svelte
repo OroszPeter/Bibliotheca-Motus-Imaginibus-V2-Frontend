@@ -14,25 +14,37 @@
     let releasedYear = new Date(movie.releasedDate).getFullYear();
     let isAtWatchlist = false;
     let fileInput;
-let editingId = null;
+    let showAlert = false;
+    let alertMessage = '';
+    let alertColor = '';
 
-let editingCommentId = null;
-let editedComment = '';
-let editedRating = 0;
+    let editingCommentId = null;
+    let editedComment = '';
+    let editedRating = 0;
 
-function startEditing(rating) {
-    editingCommentId = rating.id;
-    editedComment = rating.comment;
-    editedRating = rating.ratingNumber;
+    function showSuccessMessage(message, color) {
+        alertMessage = message;
+        alertColor = color;
+        showAlert = true;
+    
+        setTimeout(() => {
+            showAlert = false;
+        }, 3000);
+    }
 
-    // Erőltetett állapotfrissítés Svelte számára
-    editingCommentId = editingCommentId;
-}
+    function startEditing(rating) {
+        editingCommentId = rating.id;
+        editedComment = rating.comment;
+        editedRating = rating.ratingNumber;
 
-async function saveEditedComment(rating) {
+        // Erőltetett állapotfrissítés Svelte számára
+        editingCommentId = editingCommentId;
+    }
+
+    async function saveEditedComment(rating) {
     const token = getStoreValue(authToken)?.token;
     const userId = getStoreValue(userStore)?.id;
-    
+
     if (!token || rating.userId !== userId) {
         return;
     }
@@ -43,6 +55,9 @@ async function saveEditedComment(rating) {
         userId: rating.userId,
         comment: editedComment
     };
+
+    // Optimista frissítés: az UI-t azonnal frissítjük
+    movieRatings = movieRatings.map(r => r.id === rating.id ? { ...r, comment: editedComment, ratingNumber: editedRating } : r);
 
     try {
         const response = await fetch(`${API_Url}Ratings/${rating.id}`, {
@@ -72,20 +87,24 @@ async function saveEditedComment(rating) {
         editingCommentId = null;
         editedComment = '';
         editedRating = 0;
+        showSuccessMessage('Sikeres módosítás!', 'orange');
     } catch (error) {
         console.error('Hiba a komment módosításakor:', error);
+
+        // Hibakezelés: ha hiba történt, állítsuk vissza az optimista módosítást
+        movieRatings = movieRatings.map(r => r.id === rating.id ? rating : r);
     }
 }
 
 
-function cancelEdit() {
-    editingCommentId = null;
-    editedComment = '';
-    editedRating = 0;
+    function cancelEdit() {
+        editingCommentId = null;
+        editedComment = '';
+        editedRating = 0;
 
-    // Állapotfrissítés kikényszerítése
-    editingCommentId = editingCommentId;
-}
+        // Állapotfrissítés kikényszerítése
+        editingCommentId = editingCommentId;
+    }
 
     function toLogin() {
         window.location.href = "/login";
@@ -132,28 +151,59 @@ function cancelEdit() {
             if (!response.ok) throw new Error('Nem sikerült a film törlése.');
 
             // Sikerüzenet megjelenítése
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Film törölve!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = '#DC3545';
-            successMessageDiv.style.border = '1px solid black'
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
-
-            setTimeout(() => {
-                successMessageDiv.remove();
-                            }, 3000);
+            showSuccessMessage('Film törölve!', '#DC3545');
             window.location.href = "/";
         } catch (error) {
             console.error('Hiba a film törlésekor:', error);
         }
     }
+
+    // ** Az updateMovie függvény visszaállítása **
+    async function updateMovie(movieId) {
+    const token = getStoreValue(authToken)?.token;
+
+    if (!token) {
+        return;
+    }
+
+    const updatedMovie = {
+        title: movie.title,              // Film címe
+        description: movie.description,  // Film leírása
+        releasedDate: movie.releasedDate, // Film megjelenési dátuma
+        genre: movie.genre,              // Műfaj
+        length: movie.length,            // Film hossza
+        director: movie.director,        // Rendező
+        actor1: movie.actor1,            // Színész 1
+        actor2: movie.actor2,            // Színész 2
+        actor3: movie.actor3,            // Színész 3
+        isSeries: movie.isSeries,        // Sorozat-e?
+        numberOfSeasons: movie.numberOfSeasons, // Ha sorozat, hány évad?
+        numberOfEpisodes: movie.numberOfEpisodes // Ha sorozat, hány epizód?
+    };
+
+    try {
+        const response = await fetch(`${API_Url}Movie/${movieId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedMovie)
+        });
+
+        if (!response.ok) throw new Error('Hiba a film frissítésekor.');
+
+        const updatedMovieResponse = await response.text();
+        movie = updatedMovieResponse;
+
+        // Sikerüzenet megjelenítése
+        showSuccessMessage('Film frissítve!', '#28a745');
+        isEditing = false;
+    } catch (error) {
+        console.error('Hiba a film frissítésekor:', error);
+    }
+}
+
 
     async function fetchUsernames() {
         try {
@@ -170,76 +220,58 @@ function cancelEdit() {
         }
     }
 
-
     let watchlistItemId = null; // A watchlist elem ID-jának tárolása
 
-async function fetchWatchlist() {
-    const token = getStoreValue(authToken)?.token;
-    const userId = getStoreValue(userStore)?.id;
+    async function fetchWatchlist() {
+        const token = getStoreValue(authToken)?.token;
+        const userId = getStoreValue(userStore)?.id;
 
-    if (!token || !userId) {
-        return;
+        if (!token || !userId) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_Url}Watchlist`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Nem sikerült a watchlist lekérdezése.');
+
+            const watchlist = await response.json();
+            const item = watchlist.find(item => item.movieId === movie.id && item.userId === userId);
+            isAtWatchlist = !!item;
+            watchlistItemId = item ? item.id : null; // Az elem ID-jának mentése
+        } catch (error) {
+            console.error('Hiba a watchlist lekérdezésekor:', error);
+        }
     }
 
-    try {
-        const response = await fetch(`${API_Url}Watchlist`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+    async function removeFromWatchlist() {
+        const token = getStoreValue(authToken)?.token;
 
-        if (!response.ok) throw new Error('Nem sikerült a watchlist lekérdezése.');
+        if (!token || !watchlistItemId) {
+            return;
+        }
 
-        const watchlist = await response.json();
-        const item = watchlist.find(item => item.movieId === movie.id && item.userId === userId);
-        isAtWatchlist = !!item;
-        watchlistItemId = item ? item.id : null; // Az elem ID-jának mentése
-    } catch (error) {
-        console.error('Hiba a watchlist lekérdezésekor:', error);
+        try {
+            const response = await fetch(`${API_Url}Watchlist/${watchlistItemId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Nem sikerült a film eltávolítása a watchlistből.');
+
+            showSuccessMessage('Sikeresen eltávolítva a watchlistból!', '#dc3545');
+            isAtWatchlist = false;
+            watchlistItemId = null; // Törlés után nullázás
+        } catch (error) {
+            console.error('Hiba a film eltávolításakor:', error);
+        }
     }
-}
-
-async function removeFromWatchlist() {
-    const token = getStoreValue(authToken)?.token;
-
-    if (!token || !watchlistItemId) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_Url}Watchlist/${watchlistItemId}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) throw new Error('Nem sikerült a film eltávolítása a watchlistből.');
-
-        // Sikerüzenet megjelenítése
-        const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Film sikeresen eltávolítva a watchlistból!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'orange';
-            successMessageDiv.style.border = '1px solid black';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
-
-            setTimeout(() => {
-                successMessageDiv.remove();
-                            }, 3000);
-        isAtWatchlist = false;
-        watchlistItemId = null; // Törlés után nullázás
-    } catch (error) {
-        console.error('Hiba a film eltávolításakor:', error);
-    }
-}
 
     async function submitRating() {
         const token = getStoreValue(authToken)?.token;
@@ -268,23 +300,9 @@ async function removeFromWatchlist() {
             movieRatings = [...movieRatings, addedRating];
             comment = '';
             rating = 0;
-            // Sikerüzenet megjelenítése
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Értékelés elküldve!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'green';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
 
-            setTimeout(() => {
-                successMessageDiv.remove();
-                            }, 3000);
+            // Sikerüzenet megjelenítése
+            showSuccessMessage('Értékelés elküldve!', '#198754');
         } catch (error) {
             console.error('Hiba az értékelés beküldésekor:', error);
         }
@@ -317,29 +335,12 @@ async function removeFromWatchlist() {
             }
 
             // Sikerüzenet megjelenítése
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Sikeresen hozzáadva a watchlisthez!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'orange';
-            successMessageDiv.style.border = '1px solid black';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
-
-            setTimeout(() => {
-                successMessageDiv.remove();
-                            }, 3000);
+            showSuccessMessage('Sikeresen hozzáadva a watchlisthez!', 'orange');
             isAtWatchlist = true;
         } catch (error) {
             console.error('Hiba a watchlisthez adáskor:', error);
         }
     }
-
 
     async function deleteRating(id) {
         const token = getStoreValue(authToken)?.token;
@@ -359,138 +360,44 @@ async function removeFromWatchlist() {
             if (!response.ok) throw new Error('Nem sikerült az értékelés törlése.');
 
             movieRatings = movieRatings.filter(rating => rating.id !== id);
-            // Sikerüzenet megjelenítése
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Értékelés törölve!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = '#DC3545';
-            successMessageDiv.style.border = '1px solid black'
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
 
-            setTimeout(() => {
-                successMessageDiv.remove();
-                            }, 3000);
+            // Sikerüzenet megjelenítése
+            showSuccessMessage('Értékelés törölve!', '#dc3545');
         } catch (error) {
             console.error('Hiba az értékelés törlésekor:', error);
         }
     }
+
     let isEditing = false; // A szerkesztési mód követése
 
-function toggleEdit() {
-    isEditing = !isEditing;
-}
-
-async function uploadImage(filmId) {
-    if (!fileInput || !fileInput.files.length) {
-      return;
+    function toggleEdit() {
+        isEditing = !isEditing;
     }
 
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append("file", file);
+    async function uploadImage(filmId) {
+        if (!fileInput || !fileInput.files.length) {
+            return;
+        }
 
-    console.log("PUT kérés a kép feltöltéséhez, filmId:", filmId);
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
 
-    try {
-      const response = await fetch(`${API_Url}Movie/${filmId}/kep`, {
-        method: 'PUT',
-        body: formData
-      });
+        console.log("PUT kérés a kép feltöltéséhez, filmId:", filmId);
 
-      if (!response.ok) {
-        const errorResponse = await response.json();
-        console.error("Hiba a válaszban:", errorResponse);
-        throw new Error("Hiba a kép feltöltésekor");
-      }
+        try {
+            const response = await fetch(`${API_Url}Movie/${filmId}/kep`, {
+                method: 'PUT',
+                body: formData
+            });
 
-      console.log("A kép sikeresen feltöltve");
-    } catch (error) {
-      console.error("Hiba:", error);
+            if (!response.ok) throw new Error('Hiba a film képének feltöltésekor.');
+
+            showSuccessMessage('Kép sikeresen feltöltve!', '#28a745');
+        } catch (error) {
+            console.error('Hiba a kép feltöltésekor:', error);
+        }
     }
-  }
-
-async function updateMovie() {
-    const token = getStoreValue(authToken)?.token;
-    const userId = getStoreValue(userStore)?.id;
-
-    if (!token || !userId || !isEditing) {
-        return;
-    }
-
-    const updatedMovie = {
-        ...movie,
-        title: movie.title,
-        genre: movie.genre,
-        description: movie.description,
-        director: movie.director,
-        actor1: movie.actor1,
-        actor2: movie.actor2,
-        actor3: movie.actor3,
-        releasedDate: movie.releasedDate,
-        length: movie.length,
-        isSeries: movie.isSeries,
-        numberOfSeasons: movie.numberOfSeasons,
-        numberOfEpisodes: movie.numberOfEpisodes,
-    };
-
-    try {
-        const response = await fetch(`${API_Url}Movie/${movie.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(updatedMovie),
-        });
-
-        if (!response.ok) throw new Error('Nem sikerült a film frissítése.');
-
-        const updatedMovieData = await response.json();
-        movie = updatedMovieData;  // Módosítás után frissítjük a film adatokat
-        await uploadImage(movie.id);
-        isEditing = false; // Kilépünk a szerkesztési módból
-         // Sikerüzenet megjelenítése
-         const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Sikeres módosítás!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'blue';
-            successMessageDiv.style.border = '1px solid black';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
-
-            setTimeout(() => {
-                successMessageDiv.remove();
-                            }, 3000);
-    } catch (error) {
-        console.error('Hiba a film frissítésekor:', error);
-        showToast('Hiba történt a frissítéskor!', 'error'); // Hibaüzenet
-    }
-
-    toggleEdit(); // Szerkesztés mód váltása
-}
-
-
-function showToast(message, type) {
-    toast.message = message;
-    toast.type = type;
-    toast.visible = true;
-    setTimeout(() => {
-        toast.visible = false;
-    }, 3000);
-}
 
     onMount(async () => {
         try {
@@ -513,6 +420,7 @@ function showToast(message, type) {
             isLoading = false;
         }
     });
+
 </script>
 
 <main>
@@ -552,6 +460,12 @@ function showToast(message, type) {
     {#if isLoading}
         <div>Betöltés...</div>
     {:else if movie}
+
+    {#if showAlert}
+  <div class="alert" style="background-color: {alertColor};">
+    {alertMessage}
+  </div>
+{/if}
 
         <div class="container pt-5 w-75">
             <table class="pt-5">
@@ -700,6 +614,27 @@ function showToast(message, type) {
 
 
 <style>
+      .alert {
+    background-color: #28a745;  /* Zöld háttér */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
+  }
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+  }
     .modal-content{
         border: 3px solid black;
         background-color: #333;
