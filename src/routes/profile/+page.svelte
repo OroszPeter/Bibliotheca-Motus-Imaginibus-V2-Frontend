@@ -198,7 +198,7 @@
                             required
                         />
                     {/if}
-                    <button type="button" class="btn btn-outline-secondary text-secondary" on:click={toggleCurrentPasswordVisibility}>
+                    <button type="button" class="btn btn-sm btn-outline-secondary text-secondary" on:click={toggleCurrentPasswordVisibility}>
                         {#if showCurrentPassword}
                             <i class="bi bi-eye-fill"></i>
                         {:else}
@@ -230,7 +230,7 @@
                         />
                     {/if}
                     <span>
-                    <button type="button" class="btn btn-outline-secondary text-secondary" on:click={toggleNewPasswordVisibility}>
+                    <button type="button" class="btn btn-sm btn-outline-secondary text-secondary" on:click={toggleNewPasswordVisibility}>
                         {#if showNewPassword}
                             <i class="bi bi-eye-fill"></i>
                         {:else}

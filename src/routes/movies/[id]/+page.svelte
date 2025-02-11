@@ -375,29 +375,34 @@
     }
 
     async function uploadImage(filmId) {
-        if (!fileInput || !fileInput.files.length) {
-            return;
-        }
-
-        const file = fileInput.files[0];
-        const formData = new FormData();
-        formData.append("file", file);
-
-        console.log("PUT kérés a kép feltöltéséhez, filmId:", filmId);
-
-        try {
-            const response = await fetch(`${API_Url}Movie/${filmId}/kep`, {
-                method: 'PUT',
-                body: formData
-            });
-
-            if (!response.ok) throw new Error('Hiba a film képének feltöltésekor.');
-
-            showSuccessMessage('Kép sikeresen feltöltve!', '#28a745');
-        } catch (error) {
-            console.error('Hiba a kép feltöltésekor:', error);
-        }
+    if (!fileInput || !fileInput.files.length) {
+        return;
     }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    console.log("PUT kérés a kép feltöltéséhez, filmId:", filmId);
+
+    try {
+        const response = await fetch(`${API_Url}Movie/${filmId}/kep`, {
+            method: 'PUT',
+            body: formData
+        });
+
+        if (!response.ok) throw new Error('Hiba a film képének feltöltésekor.');
+
+        // **Frissítsd az imageUrl értékét az újonnan feltöltött fájlra**
+        imageUrl = URL.createObjectURL(file);
+
+        showSuccessMessage('Kép sikeresen feltöltve!', '#28a745');
+        isEditing = false;
+    } catch (error) {
+        console.error('Hiba a kép feltöltésekor:', error);
+    }
+}
+
 
     onMount(async () => {
         try {
@@ -452,7 +457,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" on:click={toggleEdit}>Mégse</button>
-          <button type="button" class="btn btn-success" data-bs-dismiss="modal" on:click={updateMovie}>Szerkesztés</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" on:click={updateMovie && uploadImage(movie.id)}>Szerkesztés</button>
         </div>
       </div>
     </div>

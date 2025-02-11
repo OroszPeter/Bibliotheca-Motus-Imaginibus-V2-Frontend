@@ -1,7 +1,9 @@
 <script>
     import { slide } from 'svelte/transition';
     import { userStore, isLoggedIn, authToken, API_Url } from '../../store.js';
-
+    let showAlert = false;
+    let alertMessage = '';
+    let alertColor = '';
     let selectedForm = 'login';
 
     let loginData = {
@@ -15,6 +17,16 @@
         email: '',
         password: ''
     };
+
+    function showSuccessMessage(message, color) {
+        alertMessage = message;
+        alertColor = color;
+        showAlert = true;
+    
+        setTimeout(() => {
+            showAlert = false;
+        }, 3000);
+    }
     
 
 
@@ -61,22 +73,8 @@
             // Bejelentkezett állapot frissítése
             isLoggedIn.set(true);
 
-            // Sikerüzenet megjelenítése
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Sikeres bejelentkezés!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'green';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
-
+            showSuccessMessage('Sikeres bejelentkezés!', '#198754');
             setTimeout(() => {
-                successMessageDiv.remove();
                 window.location.href = "/"; // Átirányítás a főoldalra
             }, 3000);
         } catch (error) {
@@ -99,7 +97,6 @@
         }
 
         const message = await response.text();
-        alert(message);
 
         // Automatikus bejelentkezés regisztráció után
         const usernameFromEmail = registerData.email.split('@')[0]; // Az e-mail cím "@" előtti része
@@ -107,6 +104,7 @@
             userName: usernameFromEmail,
             password: registerData.password
         };
+        showSuccessMessage('Sikeres regisztráció!', '#198754');
         await handleLogin(); // Regisztráció után automatikus bejelentkezés
     } catch (error) {
         console.error('Regisztrációs hiba:', error);
@@ -118,6 +116,11 @@
 
 <div class="form-bg">
     <div class="container">
+        {#if showAlert}
+  <div class="alert" style="background-color: {alertColor};">
+    {alertMessage}
+  </div>
+{/if}
         <div class="row">
             <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
                 <div class="form-container bg-danger">
@@ -186,6 +189,28 @@
 </div>
 
 <style>
+
+.alert {
+    background-color: #28a745;  /* Zöld háttér */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
+  }
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+  }
     /* Mobilon kisebb eltolás */
 @media (max-width: 576px) {
     .form-container {
