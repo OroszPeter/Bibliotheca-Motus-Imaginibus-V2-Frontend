@@ -119,20 +119,20 @@
 
 /* Kép konténer */
 .image-container {
-  width: 100%;
+  width: auto;
   height: auto;
   max-height: 500px; /* Maximális magasság, ha szükséges */
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative; /* A badge elhelyezéséhez szükséges */
-  /* overflow: hidden; Kép ne lógjon ki */
+  /* overflow: hidden; */
 }
 
 .image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 280px;
+  height: 425px;
+  object-fit: contain;
 }
 
 /* Értékelés badge */
@@ -226,6 +226,7 @@ small {
   font-size: 0.875rem;
   color: white !important;
 }
+
 </style>
 
 {#if isLoading}
