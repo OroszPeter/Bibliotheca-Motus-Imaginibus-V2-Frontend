@@ -172,15 +172,15 @@
                   </tr>
                   <tr>
                     <td></td>
-                    <td><input type="text" placeholder="Színész" bind:value={actor1} /></td>
+                    <td><input id="actor1" type="text" placeholder="Színész" bind:value={actor1} /></td>
                   </tr>
                   <tr>
                     <td>Színészek</td>
-                    <td><input type="text" placeholder="Színész" bind:value={actor2} /></td>
+                    <td><input id="actor2" type="text" placeholder="Színész" bind:value={actor2} /></td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td><input type="text" placeholder="Színész" bind:value={actor3} /></td>
+                    <td><input id="actor3" type="text" placeholder="Színész" bind:value={actor3} /></td>
                   </tr>
                 </tbody>
               </table>
