@@ -167,18 +167,18 @@
     }
 
     const updatedMovie = {
-        title: movie.title,              // Film címe
-        description: movie.description,  // Film leírása
-        releasedDate: movie.releasedDate, // Film megjelenési dátuma
-        genre: movie.genre,              // Műfaj
-        length: movie.length,            // Film hossza
-        director: movie.director,        // Rendező
-        actor1: movie.actor1,            // Színész 1
-        actor2: movie.actor2,            // Színész 2
-        actor3: movie.actor3,            // Színész 3
-        isSeries: movie.isSeries,        // Sorozat-e?
-        numberOfSeasons: movie.numberOfSeasons, // Ha sorozat, hány évad?
-        numberOfEpisodes: movie.numberOfEpisodes // Ha sorozat, hány epizód?
+        title: movie.title,              
+        description: movie.description,  
+        releasedDate: movie.releasedDate,
+        genre: movie.genre,              
+        length: movie.length,            
+        director: movie.director,        
+        actor1: movie.actor1,            
+        actor2: movie.actor2,            
+        actor3: movie.actor3,            
+        isSeries: movie.isSeries,        
+        numberOfSeasons: movie.numberOfSeasons, 
+        numberOfEpisodes: movie.numberOfEpisodes 
     };
 
     try {
@@ -193,16 +193,20 @@
 
         if (!response.ok) throw new Error('Hiba a film frissítésekor.');
 
-        const updatedMovieResponse = await response.text();
-        movie = updatedMovieResponse;
+        const message = await response.text(); // Csak egy üzenetet kapunk vissza
+        console.log('Szerver válasza:', message);
 
-        // Sikerüzenet megjelenítése
+        // **A movie objektum frissítése manuálisan, mert a szerver nem küldi vissza az új adatokat**
+        Object.assign(movie, updatedMovie);
+
         showSuccessMessage('Film frissítve!', '#28a745');
-        isEditing = false;
     } catch (error) {
         console.error('Hiba a film frissítésekor:', error);
     }
+    toggleEdit();
 }
+
+
 
 
     async function fetchUsernames() {
@@ -397,7 +401,6 @@
         imageUrl = URL.createObjectURL(file);
 
         showSuccessMessage('Kép sikeresen feltöltve!', '#28a745');
-        isEditing = false;
     } catch (error) {
         console.error('Hiba a kép feltöltésekor:', error);
     }
@@ -457,7 +460,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal" on:click={toggleEdit}>Mégse</button>
-          <button type="button" class="btn btn-success" data-bs-dismiss="modal" on:click={updateMovie && uploadImage(movie.id)}>Szerkesztés</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" on:click={() => updateMovie(movie.id) && uploadImage(movie.id)}>Szerkesztés</button>
         </div>
       </div>
     </div>
