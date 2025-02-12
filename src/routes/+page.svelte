@@ -95,6 +95,11 @@
 {/if}
 
 <style>
+    .card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    transition: all 0.3s ease-in-out;
+  }
   /* Betöltés animáció */
 .spinner-grow {
   position: absolute;

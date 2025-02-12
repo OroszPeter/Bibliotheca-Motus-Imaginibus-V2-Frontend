@@ -1,6 +1,7 @@
 <script>
     import { slide } from 'svelte/transition';
     import { userStore, isLoggedIn, authToken, API_Url } from '../../store.js';
+    import { onMount } from 'svelte';
     let showAlert = false;
     let alertMessage = '';
     let alertColor = '';

@@ -62,6 +62,11 @@
   width: 50px;
   height: 50px;
 }
+.card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    transition: all 0.3s ease-in-out;
+  }
 
 /* Tartalom reszponzív elhelyezése */
 .content {
