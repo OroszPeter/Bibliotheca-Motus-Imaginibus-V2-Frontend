@@ -185,7 +185,6 @@
                             id="currentPassword"
                             bind:value={oldPassword}
                             placeholder="Jelenlegi jelszó"
-                            required
                         />
                     {:else}
                         <!-- Jelszó mező -->
@@ -195,7 +194,6 @@
                             id="currentPassword"
                             bind:value={oldPassword}
                             placeholder="Jelenlegi jelszó"
-                            required
                         />
                     {/if}
                     <button type="button" class="btn btn-sm btn-outline-secondary text-secondary" on:click={toggleCurrentPasswordVisibility}>
@@ -216,7 +214,6 @@
                             id="newPassword"
                             bind:value={newPassword}
                             placeholder="Új jelszó"
-                            required
                         />
                     {:else}
                         <!-- Jelszó mező -->
@@ -226,7 +223,6 @@
                             id="newPassword"
                             bind:value={newPassword}
                             placeholder="Új jelszó"
-                            required
                         />
                     {/if}
                     <span>
