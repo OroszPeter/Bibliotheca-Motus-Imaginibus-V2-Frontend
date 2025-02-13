@@ -196,13 +196,7 @@
                             placeholder="Jelenlegi jelszó"
                         />
                     {/if}
-                    <button type="button" class="btn btn-sm btn-outline-secondary text-secondary" on:click={toggleCurrentPasswordVisibility}>
-                        {#if showCurrentPassword}
-                            <i class="bi bi-eye-fill"></i>
-                        {:else}
-                            <i class="bi bi-eye-slash-fill"></i>
-                        {/if}
-                    </button>
+                    
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-lock-fill"></i></span>
@@ -226,13 +220,7 @@
                         />
                     {/if}
                     <span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary text-secondary" on:click={toggleNewPasswordVisibility}>
-                        {#if showNewPassword}
-                            <i class="bi bi-eye-fill"></i>
-                        {:else}
-                            <i class="bi bi-eye-slash-fill"></i>
-                        {/if}
-                    </button>
+                    
                     </span>
                             </div>
                             <button class="btn signin bg-danger" type="submit">Módosít</button>
@@ -269,155 +257,179 @@
 
 
 <style>
-    h5{
-        font-size: 20px;
-    }
-    p{
-        color: black;
-        z-index: 100;
-    }
-    .form-container{
-        position: relative;
-        top: 50%;
-        left: 75%;
-        font-family: 'Roboto', sans-serif;
-        font-size: 0;
-        padding: 0 15px;
-        border: 1px solid #DC2036;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    }
-    .form-container .form-icon{
-        color: #fff;
-        font-size: 13px;
-        text-align: center;
-        text-shadow: 0 0 20px rgba(0,0,0,0.2);
-        width: 50%;
-        padding: 70px 0;
-        vertical-align: top;
-        display: inline-block;
-    }
-    .form-container .form-icon i{
-        font-size: 124px;
-        margin: 0 0 15px;
-        display: block;
-    }
-    .form-container .form-icon .signup a{
-        color: #fff;
-        text-transform: capitalize;
-        transition: all 0.3s ease;
-    }
-    .form-container .form-icon .signup a:hover{ text-decoration: underline; }
-    .form-container .form-horizontal{
-        background: rgba(255,255,255,0.99);
-        width: 50%;
-        padding: 60px 30px;
-        margin: -20px 0;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-        display: inline-block;
-    }
-    .form-container .title{
-        color: #454545;
-        font-size: 23px;
-        font-weight: 900;
-        text-align: center;
-        text-transform: capitalize;
-        letter-spacing: 0.5px;
-        margin: 0 0 30px 0;
-    }
-    .form-horizontal .form-group{
-        background-color: rgba(255,255,255,0.15);
-        margin: 0 0 15px;
-        border: 1px solid #b5b5b5;
-        border-radius: 20px;
-    }
-    .form-horizontal .input-icon{
-        color: #b5b5b5;
-        font-size: 15px;
-        text-align: center;
-        line-height: 38px;
-        height: 35px;
-        width: 40px;
-        vertical-align: top;
-        display: inline-block;
-    }
-    .form-horizontal .form-control{
-        color: #b5b5b5;
-        background-color: transparent;
-        font-size: 14px;
-        letter-spacing: 1px;
-        width: calc(100% - 55px);
-        height: 33px;
-        padding: 2px 10px 0 0;
-        box-shadow: none;
-        border: none;
-        border-radius: 0;
-        display: inline-block;
-        transition: all 0.3s;
-    }
-    .form-horizontal .form-control:focus{
-        box-shadow: none;
-        border: none;
-    }
-    .form-horizontal .form-control::placeholder{
-        color: #b5b5b5;
-        font-size: 13px;
-        text-transform: capitalize;
-    }
-    .form-horizontal .btn{
-        color: rgba(255,255,255,0.8);
-        font-size: 15px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin: 0 0 10px 0;
-        border: none;
-        border-radius: 20px;
-        transition: all 0.3s ease;
-    }
-    .signin{
-        width: 100%;
-    }
-    .form-horizontal .btn:hover,
-    .form-horizontal .btn:focus{
-        color: #fff;
-        background-color: #D31128;
-        box-shadow: 0 0 5px rgba(0,0,0,0.5);
-    }
-    .form-horizontal .forgot-pass{
-        font-size: 12px;
-        text-align: center;
-        display: block;
-    }
-    .form-horizontal .forgot-pass a{
-        color: #999;
-        transition: all 0.3s ease;
-    }
-    .form-horizontal .forgot-pass a:hover{
-        color: #777;
-        text-decoration: underline;
-    }
-    @media only screen and (max-width:576px){
-        .form-container{ padding-bottom: 15px; }
-        .form-container .form-icon{
-            width: 100%;
-            padding: 20px 0;
-        }
-        .form-container .form-horizontal{
-            width: 100%;
-            margin: 0;
-        }
-    }
-    .form-group{
-        display: flex;
-    }
-    .btn-outline-secondary {
-        border-radius: 0 4px 4px 0;
-        background-color: white;
-        color: #454545;
-        width: 35px;
-        height: 35px;
-    }
 
-</style>
+    .alert {
+        background-color: #28a745;  /* Zöld háttér */
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        width: 300px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
+      }
+    
+    @keyframes fadeOut {
+        0% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; display: none; }
+      }
+        /* Mobilon kisebb eltolás */
+    @media (max-width: 576px) {
+        .form-container {
+            left: 60%;
+            transform: translate(-50%);
+            margin-top: 30px; /* 60px eltolás */
+            width: 80%; /* Szélesebb, hogy ne legyen túl kicsi */
+        }
+    }
+    
+    @media (min-width: 576px) and (max-width: 1024px) {
+        .form-container {
+            width: 80%; /* Tableten szélesebb, de nem teljes szélesség */
+        }
+    }
+    @media (min-width: 1024px) {
+        .form-container{
+            position: relative;
+            top: 50%;
+            left: 75%;
+        }
+    }
+        .form-container{
+            position: relative;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0;
+            padding: 0 15px;
+            border: 1px solid #DC2036;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        .form-container .form-icon{
+            color: #fff;
+            font-size: 13px;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0,0,0,0.2);
+            width: 50%;
+            padding: 70px 0;
+            vertical-align: top;
+            display: inline-block;
+        }
+        .form-container .form-icon i{
+            font-size: 124px;
+            margin: 0 0 15px;
+            display: block;
+        }
+        .form-container .form-icon .signup a{
+            color: #fff;
+            text-transform: capitalize;
+            transition: all 0.3s ease;
+        }
+        .form-container .form-icon .signup a:hover{ text-decoration: underline; }
+        .form-container .form-horizontal{
+            background: rgba(255,255,255,0.99);
+            width: 50%;
+            padding: 60px 30px;
+            margin: -20px 0;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            display: inline-block;
+        }
+        .form-container .title{
+            color: #454545;
+            font-size: 23px;
+            font-weight: 900;
+            text-align: center;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            margin: 0 0 30px 0;
+        }
+        .form-horizontal .form-group{
+            background-color: rgba(255,255,255,0.15);
+            margin: 0 0 15px;
+            border: 1px solid #b5b5b5;
+            border-radius: 20px;
+        }
+        .form-horizontal .input-icon{
+            color: #b5b5b5;
+            font-size: 15px;
+            text-align: center;
+            line-height: 38px;
+            height: 35px;
+            width: 40px;
+            vertical-align: top;
+            display: inline-block;
+        }
+        .form-horizontal .form-control{
+            color: #b5b5b5;
+            background-color: transparent;
+            font-size: 14px;
+            letter-spacing: 1px;
+            width: calc(100% - 55px);
+            height: 33px;
+            padding: 2px 10px 0 0;
+            box-shadow: none;
+            border: none;
+            border-radius: 0;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .form-horizontal .form-control:focus{
+            box-shadow: none;
+            border: none;
+        }
+        .form-horizontal .form-control::placeholder{
+            color: #b5b5b5;
+            font-size: 13px;
+            text-transform: capitalize;
+        }
+        .form-horizontal .btn{
+            color: rgba(255,255,255,0.8);
+            background: #E9374C;
+            font-size: 15px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            margin: 0 0 10px 0;
+            border: none;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .form-horizontal .btn:hover,
+        .form-horizontal .btn:focus{
+            color: #fff;
+            background-color: #D31128;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .form-horizontal .forgot-pass{
+            font-size: 12px;
+            text-align: center;
+            display: block;
+        }
+        .form-horizontal .forgot-pass a{
+            color: #999;
+            transition: all 0.3s ease;
+        }
+        .form-horizontal .forgot-pass a:hover{
+            color: #777;
+            text-decoration: underline;
+        }
+        @media only screen and (max-width:576px){
+            .form-container{ padding-bottom: 15px; }
+            .form-container .form-icon{
+                width: 100%;
+                padding: 20px 0;
+            }
+            .form-container .form-horizontal{
+                width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
+    
