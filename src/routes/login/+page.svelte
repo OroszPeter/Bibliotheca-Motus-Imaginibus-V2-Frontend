@@ -112,6 +112,11 @@
         alert('Sikertelen regisztráció');
     }
 }
+onMount(async () => {
+    if ($isLoggedIn) {
+        window.location.href = "/";
+    }
+})
 </script>
 
 
@@ -122,6 +127,8 @@
     {alertMessage}
   </div>
 {/if}
+{#if $isLoggedIn}
+{:else}
         <div class="row">
             <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
                 <div class="form-container bg-danger">
@@ -186,6 +193,7 @@
                 </div>
             </div>
         </div>
+        {/if}
     </div>
 </div>
 

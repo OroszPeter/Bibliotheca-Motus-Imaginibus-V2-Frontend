@@ -47,38 +47,44 @@
     }
 
     // Adatok módosítása
-    async function handleSubmit(event) {
-        event.preventDefault();
+async function handleSubmit(event) {
+    event.preventDefault();
 
-        let isUpdated = false;
+    let isUpdated = false;
 
-        if (newUsername) {
-            const success = await updateUserData('Account/update-username', { newUsername });
-            if (success) {
-                userStore.update((user) => ({ ...user, userName: newUsername }));
-                isUpdated = true;
-            }
-        }
-
-        if (newEmail) {
-            const success = await updateUserData('Account/update-email', { newEmail });
-            if (success) {
-                userStore.update((user) => ({ ...user, email: newEmail }));
-                isUpdated = true;
-            }
-        }
-
-        if (oldPassword && newPassword) {
-            const success = await updateUserData('Account/update-password', { oldPassword, newPassword });
-            if (success) {
-                isUpdated = true;
-            }
-        }
-
-        if (isUpdated) {
-            showSuccessMessage('Adatok sikeresen módosítva!', '#198754');
+    if (newUsername) {
+        const success = await updateUserData('Account/update-username', { newUsername });
+        if (success) {
+            userStore.update((user) => ({ ...user, userName: newUsername }));
+            newUsername = ""; // Input törlése
+            isUpdated = true;
         }
     }
+
+    if (newEmail) {
+        const success = await updateUserData('Account/update-email', { newEmail });
+        if (success) {
+            userStore.update((user) => ({ ...user, email: newEmail }));
+            newEmail = ""; // Input törlése
+            isUpdated = true;
+        }
+    }
+
+    if (oldPassword && newPassword) {
+        const success = await updateUserData('Account/update-password', { oldPassword, newPassword });
+        if (success) {
+            oldPassword = ""; // Input törlése
+            newPassword = ""; // Input törlése
+            isUpdated = true;
+        }
+    }
+
+    if (isUpdated) {
+        showSuccessMessage('Adatok sikeresen módosítva!', '#198754');
+        selectedForm = 'userdata';
+    }
+}
+
 
     function showSuccessMessage(message, color) {
         alertMessage = message;

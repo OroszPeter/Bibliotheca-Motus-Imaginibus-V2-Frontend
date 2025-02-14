@@ -1,5 +1,5 @@
 <script>
-    import { API_Url } from '../../store.js';
+    import { API_Url, isLoggedIn } from '../../store.js';
     import { onMount } from 'svelte';
     import { push } from 'svelte-spa-router'; // Ha SPA routingot használsz
   
@@ -30,8 +30,14 @@
         const errorData = await response.text();
       }
     }
+    onMount(async () => {
+    if ($isLoggedIn) {
+        window.location.href = "/";
+    }
+})
   </script>
-  
+  {#if $isLoggedIn}
+  {:else}
   <div class="form-bg">
     <div class="container">
       {#if showAlert}
@@ -56,6 +62,7 @@
       </div>
     </div>
   </div>
+  {/if}
   
 <style>
   .alert {
