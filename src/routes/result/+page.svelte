@@ -6,6 +6,7 @@
   let movies = [];
   let totalResults = 0;
   let ratings = [];
+  let isLoading = true;
 
   onMount(async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -61,10 +62,14 @@
       }
     }
   }
+  isLoading = false;
 });
 </script>
 
 <main>
+  {#if isLoading}
+  <div class="spinner-grow" role="status"></div>
+  {:else}
   <div class="content mt-5">
     <div class="container mt-4">
       <h2 id="resultnumber" class="mb-5">Összesen: {totalResults} találat</h2>
@@ -88,7 +93,7 @@
       </div>
     </div>
   </div>
-
+  {/if}
 
 </main>
 <style>
@@ -125,28 +130,6 @@
     }
   }
   
-  /* Kategória gombok */
-  .category-button {
-    display: inline-block;
-    margin-right: 20px; /* Növelt margó a nagy képernyőkhöz */
-    padding: 12px 20px; /* Kisebb gombok paddingja */
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1rem; /* Nagyobb betűméret */
-  }
-  
-  .category-button.active {
-    background-color: #811331;
-    font-weight: bold;
-  }
-  
-  .category-button:hover {
-    background-color: #555;
-  }
-  
   /* Kártyák és elrendezés */
   .card {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -175,7 +158,7 @@
   
   .image-container img {
     width: 100%;
-    height: 300px;
+    height: 425px;
     object-fit: cover;
   }
   

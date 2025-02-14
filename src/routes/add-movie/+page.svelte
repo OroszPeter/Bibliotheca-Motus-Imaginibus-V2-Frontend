@@ -129,9 +129,9 @@
           </td>
           <td class="desc" style="padding-left:10px; padding-right:10px;">
             <div class="content">
-              <h2>
+              <p>
                 <input type="text" placeholder="Cím" bind:value={title} />
-              </h2>
+              </p>
               <p><strong><input type="text" placeholder="Műfaj" bind:value={genre} /></strong></p>
               <input type="date" placeholder="Megjelenési idő" bind:value={releasedDate} /><br />
               <p class="input-label">
@@ -276,24 +276,6 @@
     width: 33%; /* Egyenlő szélesség minden td számára */
   }
 
-  .star {
-    font-size: 2rem;
-    color: #ccc;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-
-  .star.selected,
-  .star:hover,
-  .star:active {
-    color: gold;
-  }
-
-  .star-rating label:hover,
-  .star-rating label.selected {
-    color: gold;
-  }
-
   td input {
     width: 100%; /* Az inputok kitöltik a td teljes szélességét */
   }
@@ -302,26 +284,9 @@
   .table td {
     vertical-align: middle;
   }
-
-  .star-rating label {
-    margin: 0 5px;
-  }
-
-  .addcomment {
-    max-width: 100%;
-  }
-
-  .star-rating {
-    display: flex;
-    justify-content: flex-start;
-  }
-
   /* Checkbox stílus */
   input[type="checkbox"] {
     margin: 10px 0; /* Térköz a checkbox körül */
   }
-
-  
-
 </style>
 

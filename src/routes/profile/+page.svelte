@@ -17,8 +17,9 @@
     let newEmail = '';
     let oldPassword = '';
     let newPassword = '';
-    let showCurrentPassword = false;
-    let showNewPassword = false;
+    let showAlert = false;
+    let alertMessage = '';
+    let alertColor = '';
 
     // PUT kérés küldése API végpontra
     async function updateUserData(endpoint, payload) {
@@ -75,25 +76,20 @@
         }
 
         if (isUpdated) {
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Adatok sikeresen frissítve!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'green';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
-
-            setTimeout(() => {
-                selectedForm = 'userdata';
-                successMessageDiv.remove();
-            }, 3000);
+            showSuccessMessage('Adatok sikeresen módosítva!', '#198754');
         }
     }
+
+    function showSuccessMessage(message, color) {
+        alertMessage = message;
+        alertColor = color;
+        showAlert = true;
+    
+        setTimeout(() => {
+            showAlert = false;
+        }, 3000);
+    }
+
     // Profil törlése
     async function handleDeleteProfile() {
     if (!confirm('Biztosan törölni szeretnéd a profilodat?')) {
@@ -110,19 +106,7 @@
 
         if (response.ok) {
             const message = await response.text(); // Szöveges válasz feldolgozása
-            const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Profil sikeresen törölve!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'red';
-            successMessageDiv.style.border = '1px solid black';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
+            showSuccessMessage('Profil sikeresen törölve', '#dc3545');
 
             // Adatok törlése a store-ból és a localStorage-ból
             userStore.set({});
@@ -132,7 +116,6 @@
             // Átirányítás a kezdőlapra vagy bejelentkező oldalra
             setTimeout(() => {
                 window.location.href = '/';
-                successMessageDiv.remove();
             }, 1000);
             isLoggedIn.set(false);
         }
@@ -140,18 +123,15 @@
         console.error('Hálózati hiba:', error);
     }
 }
-    // Jelszó láthatóságának kezelése
-    function toggleCurrentPasswordVisibility() {
-        showCurrentPassword = !showCurrentPassword;
-    }
-
-    function toggleNewPasswordVisibility() {
-        showNewPassword = !showNewPassword;
-    }
 </script>
 
 <div class="form-bg">
     <div class="container">
+        {#if showAlert}
+      <div class="alert alert-success">
+        {alertMessage}
+      </div>
+    {/if}
         <div class="row">
             <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
                 <div class="form-container bg-danger">
@@ -177,16 +157,7 @@
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-unlock-fill"></i></span>
-                                {#if showCurrentPassword}
-                        <!-- Szöveges mező a jelszó helyett -->
-                        <input
-                            type="text"
-                            class="form-control current-password"
-                            id="currentPassword"
-                            bind:value={oldPassword}
-                            placeholder="Jelenlegi jelszó"
-                        />
-                    {:else}
+                                
                         <!-- Jelszó mező -->
                         <input
                             type="password"
@@ -195,21 +166,10 @@
                             bind:value={oldPassword}
                             placeholder="Jelenlegi jelszó"
                         />
-                    {/if}
-                    
                             </div>
                             <div class="form-group">
                                 <span class="input-icon"><i class="bi bi-lock-fill"></i></span>
-                                {#if showNewPassword}
-                        <!-- Szöveges mező az új jelszó helyett -->
-                        <input
-                            type="text"
-                            class="form-control new-password"
-                            id="newPassword"
-                            bind:value={newPassword}
-                            placeholder="Új jelszó"
-                        />
-                    {:else}
+                    
                         <!-- Jelszó mező -->
                         <input
                             type="password"
@@ -218,9 +178,7 @@
                             bind:value={newPassword}
                             placeholder="Új jelszó"
                         />
-                    {/if}
                     <span>
-                    
                     </span>
                             </div>
                             <button class="btn signin bg-danger" type="submit">Módosít</button>
@@ -258,21 +216,25 @@
 
 <style>
 
-    .alert {
-        background-color: #28a745;  /* Zöld háttér */
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        text-align: center;
-        position: fixed;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        width: 300px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
-      }
+.alert {
+    background-color: #28a745;  /* Zöld háttér */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .alert.alert-success {
+    display: block;
+    animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
+  }
     
     @keyframes fadeOut {
         0% { opacity: 1; }
@@ -406,19 +368,6 @@
             color: #fff;
             background-color: #D31128;
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
-        .form-horizontal .forgot-pass{
-            font-size: 12px;
-            text-align: center;
-            display: block;
-        }
-        .form-horizontal .forgot-pass a{
-            color: #999;
-            transition: all 0.3s ease;
-        }
-        .form-horizontal .forgot-pass a:hover{
-            color: #777;
-            text-decoration: underline;
         }
         @media only screen and (max-width:576px){
             .form-container{ padding-bottom: 15px; }

@@ -4,6 +4,8 @@
     import { push } from 'svelte-spa-router'; // Ha SPA routingot használsz
   
     let email = '';
+    let showAlert = false;
+    let alertMessage = 'Jelszó visszaállító email elküldve!';
   
     async function handleForgotPassword() {
       const url = `${API_Url}Account/forget-password`;
@@ -17,22 +19,10 @@
   
       if (response.ok) {
         const data = await response.text();
-        const successMessageDiv = document.createElement('div');
-            successMessageDiv.textContent = 'Visszaállító email elküldve!';
-            successMessageDiv.style.position = 'fixed';
-            successMessageDiv.style.top = '20px';
-            successMessageDiv.style.left = '50%';
-            successMessageDiv.style.transform = 'translateX(-50%)';
-            successMessageDiv.style.backgroundColor = 'green';
-            successMessageDiv.style.border = '1px solid black';
-            successMessageDiv.style.color = 'white';
-            successMessageDiv.style.padding = '10px 20px';
-            successMessageDiv.style.borderRadius = '5px';
-            successMessageDiv.style.zIndex = '1000';
-            document.body.appendChild(successMessageDiv);
+        showAlert = true;
 
             setTimeout(() => {
-                successMessageDiv.remove();
+                showAlert= false;
                 window.location.href = "/login";
                             }, 3000);
         
@@ -44,6 +34,11 @@
   
   <div class="form-bg">
     <div class="container">
+      {#if showAlert}
+        <div class="alert alert-success">
+          {alertMessage}
+        </div>
+      {/if}
       <div class="row">
         <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8">
           <div class="form-container p-5 bg-danger">
@@ -63,6 +58,25 @@
   </div>
   
 <style>
+  .alert {
+    background-color: #28a745;  /* Zöld háttér */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .alert.alert-success {
+    display: block;
+    animation: fadeOut 3s forwards;  /* Animáció, hogy eltűnjön */
+  }
   /* Tartalom reszponzív elhelyezése */
 .container {
   padding: 20px;
@@ -105,36 +119,6 @@
     color: gray;
     background-color: wheat;
 }
-  .form-container .form-icon{
-      color: #fff;
-      font-size: 13px;
-      text-align: center;
-      text-shadow: 0 0 20px rgba(0,0,0,0.2);
-      width: 50%;
-      padding: 70px 0;
-      vertical-align: top;
-      display: inline-block;
-  }
-  .form-container .form-icon i{
-      font-size: 124px;
-      margin: 0 0 15px;
-      display: block;
-  }
-  .form-container .form-icon .signup a{
-      color: #fff;
-      text-transform: capitalize;
-      transition: all 0.3s ease;
-  }
-  .form-container .form-icon .signup a:hover{ text-decoration: underline; }
-  .form-container .form-horizontal{
-      background: rgba(255,255,255,0.99);
-      width: 50%;
-      padding: 60px 30px;
-      margin: -20px 0;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      display: inline-block;
-  }
   .form-container .title{
       color: #454545;
       font-size: 23px;
@@ -146,10 +130,6 @@
   }
   @media only screen and (max-width:576px){
       .form-container{ padding-bottom: 15px; }
-      .form-container .form-icon{
-          width: 100%;
-          padding: 20px 0;
-      }
   }
   .form-group {
     position: relative;

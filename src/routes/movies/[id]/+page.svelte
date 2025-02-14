@@ -484,7 +484,7 @@
                                 {#if imageUrl}
                                     <img src={imageUrl} class="img-fluid" alt={movie.title} />
                                 {:else}
-                                    <img src="https://placehold.co/400x600" class="img-fluid" alt="Placeholder image" />
+                                <img src="https://placehold.co/400x600" class="img-fluid" alt="placeholder image"/>
                                 {/if}
                             </div>
                         </td>
@@ -493,16 +493,19 @@
                                 <h2>
                                     {movie.title} <small>({releasedYear})</small>
                                     {#if isAtWatchlist}
-                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => removeFromWatchlist()} title="Eltávolítás a watchlistből"><i class="bi bi-bookmark-fill"></i></button>
-                                    {:else}
-                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => AddToWatchlist()} title="Hozzáadás watchlist-hez"><i class="bi bi-bookmark"></i></button>
-                                    {/if}
+                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => removeFromWatchlist()} title="Eltávolítás a watchlistből" aria-label="Eltávolítás a watchlistből">
+                                      <i class="bi bi-bookmark-fill"></i>
+                                    </button>
+                                  {:else}
+                                    <button class="btn btn-primary btn-sm ms-2" on:click={() => AddToWatchlist()} title="Hozzáadás watchlist-hez" aria-label="Hozzáadás watchlist-hez">
+                                      <i class="bi bi-bookmark"></i>
+                                    </button>
+                                  {/if}
                                     {#if $isLoggedIn && ($userStore.roles) && $userStore.roles[0] === "Admin"}
-                                    <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)}><i class="bi bi-trash" title="Törlés"></i></button>
+                                    <button class="btn btn-danger btn-sm ms-2" on:click={() => deleteMovie(movie.id)} title="Törlés" aria-label="Törlés"><i class="bi bi-trash"></i></button>
                                     {#if $isLoggedIn && $userStore.roles && $userStore.roles[0] === "Admin"}
-                                        {#if isEditing}
-                                        {:else}
-                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" on:click={toggleEdit}><i class="bi bi-pencil" title="Szerkesztés"></i></button>
+                                        {#if !isEditing}
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" on:click={toggleEdit} title="Szerkesztés" aria-label="Szerkesztés"><i class="bi bi-pencil"></i></button>
                                         {/if}
     {/if}
                                     {/if}
@@ -550,17 +553,18 @@
                         {#if $isLoggedIn}
                         <td class="comment" colspan="2">
                             <div class="addcomment mt-4 align-top">
-                                <div class="star-rating mb-3" on:mouseleave={resetRating}>
+                                <div class="star-rating mb-3" on:mouseleave={resetRating} role="radiogroup" tabindex="0">
                                     {#each Array(5).fill(0) as _, index}
-                                        <label
-                                            class="star"
-                                            on:mouseover={() => hoverRating(index + 1)}
-                                            on:click={() => setRating(index + 1)}
-                                        >
-                                            {hoverRatingValue >= index + 1 || rating >= index + 1 ? '★' : '☆'}
-                                        </label>
+                                    <button
+  class="star btn"
+  on:mouseover={() => hoverRating(index + 1)}
+  on:focus={() => hoverRating(index + 1)}
+  on:click={() => setRating(index + 1)}
+>
+  {hoverRatingValue >= index + 1 || rating >= index + 1 ? '★' : '☆'}
+</button>
                                     {/each}
-                                </div>
+                                  </div>
                                 <textarea bind:value={comment} name="komment" id="comment"></textarea>
                                 <button id="send" class="btn btn-success" on:click={submitRating}>Küldés</button>
                             </div>
@@ -776,28 +780,6 @@
     .desc {
         width: 100%;
     }
-    .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        border-radius: 5px;
-        color: white;
-        opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        transform: translateY(-20px);
-    }
-    .toast.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    .toast.success {
-        background-color: #28a745;
-    }
-    .toast.error {
-        background-color: #dc3545;
-    }
-    
     /* Reszponzivitás kisebb eszközökre */
     @media (max-width: 768px) {
         .container {
@@ -856,27 +838,6 @@
     
     .desc {
         width: 300px;
-    }
-    .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        border-radius: 5px;
-        color: white;
-        opacity: 0;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        transform: translateY(-20px);
-    }
-    .toast.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    .toast.success {
-        background-color: #28a745;
-    }
-    .toast.error {
-        background-color: #dc3545;
     }
     @media (min-width: 1024px) {
     .container {

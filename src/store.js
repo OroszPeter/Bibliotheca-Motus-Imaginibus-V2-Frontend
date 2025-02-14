@@ -1,8 +1,5 @@
 import { writable } from 'svelte/store';
 
-// Night mode store
-export const nightMode = writable(false);
-
 // Kezdeti felhasználói adatok a localStorage-ból (ha léteznek)
 const isBrowser = typeof window !== 'undefined';
 

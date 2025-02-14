@@ -43,9 +43,8 @@
     );
   } catch (error) {
     console.error('Hiba a filmek vagy értékelések betöltésekor:', error);
-  } finally {
-    isLoading = false;
   }
+  isLoading = false;
 });
 
   function filterCategory(category) {
@@ -136,7 +135,7 @@
   
   .image-container img {
     width: 100%;
-    height: 300px;
+    height: 425px;
     object-fit: cover;
   }
   
