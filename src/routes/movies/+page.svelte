@@ -70,7 +70,7 @@
   .content {
     padding: 20px;
     color: white;
-    margin-left: 60px; /* Mobilon kisebb eltolás */
+    margin-left: 60px; /* Mobilon kisebb eltolással */
   }
   
   @media (min-width: 768px) {
