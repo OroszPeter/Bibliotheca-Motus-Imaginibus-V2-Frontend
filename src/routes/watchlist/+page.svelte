@@ -57,11 +57,10 @@
   };
 
   const updateIcons = () => {
-    const scrollWidth = carousel.scrollWidth - carousel.clientWidth;
-    showLeftIcon = carousel.scrollLeft === 0 ? false : true;
-    showRightIcon = carousel.scrollLeft === scrollWidth ? false : true;
-  };
-
+  const scrollWidth = carousel.scrollWidth - carousel.clientWidth;
+  showLeftIcon = carousel.scrollLeft > 0;
+  showRightIcon = carousel.scrollLeft < scrollWidth; // Itt pontosítottam a feltételt
+};
   const fetchWatchlist = async () => {
     const token = get(authToken).token;
     const userId = get(userStore).id; 

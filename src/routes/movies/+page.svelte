@@ -51,6 +51,76 @@
     selectedCategory = category;
   }
 </script>
+
+{#if isLoading}
+<div class="spinner-grow" role="status"></div>
+{:else}
+<div class="content mt-5">
+  <div class="container mt-4">
+    <h2 class="mb-5">Filmek</h2>
+    <h3>Kategóriák</h3>
+    <hr>
+    {#each ['Összes', ...Object.keys(categorizedMovies)] as genre}
+      <button 
+        class="category-button {selectedCategory === genre ? 'active' : ''}"
+        on:click={() => filterCategory(genre)}>
+        {genre}
+      </button>
+    {/each}
+    <hr>
+
+    {#if selectedCategory === 'Összes'}
+      {#each Object.keys(categorizedMovies) as genre}
+        <h4>{genre}</h4>
+        <div class="row">
+          {#each categorizedMovies[genre].slice(0, 4) as movie}
+            <div class="col mb-4">
+              <div class="card">
+                <a href={`/movies/${movie.id}`} class="image-link">
+                  <div class="image-container">
+                    <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
+                    <div class="badge">{movie.averageRating.toFixed(1)}</div>
+                  </div>
+                </a>
+
+                <div class="card-body">
+                  <h5 class="card-title">{movie.title}</h5>
+                  <small class="text-muted">{movie.genre}</small>
+                </div>
+              </div>
+            </div>
+          {/each}
+          <button 
+            class="category-button" 
+            on:click={() => filterCategory(genre)}>Összes megjelenítése</button>
+        </div>
+      {/each}
+    {:else}
+      <h4>{selectedCategory}</h4>
+      <div class="row">
+        {#each categorizedMovies[selectedCategory] as movie}
+          <div class="col mb-4">
+            <div class="card">
+              <a href={`/movies/${movie.id}`} class="image-link">
+                <div class="image-container">
+                  <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
+                  <div class="badge">{movie.averageRating.toFixed(1)}</div>
+                </div>
+              </a>
+
+              <div class="card-body">
+                <h5 class="card-title">{movie.title}</h5>
+                <small class="text-muted">{movie.genre}</small>
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+</div>
+{/if}
+
 <style>
   .card:hover {
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -70,7 +140,7 @@
   .content {
     padding: 20px;
     color: white;
-    margin-left: 60px; /* Mobilon kisebb eltolással */
+    margin-left: 60px; /* Mobilon kisebb eltolás */
   }
   
   @media (min-width: 768px) {
@@ -228,72 +298,3 @@
   }
   
   </style>
-
-{#if isLoading}
-<div class="spinner-grow" role="status"></div>
-{:else}
-<div class="content mt-5">
-  <div class="container mt-4">
-    <h2 class="mb-5">Filmek</h2>
-    <h3>Kategóriák</h3>
-    <hr>
-    {#each ['Összes', ...Object.keys(categorizedMovies)] as genre}
-      <button 
-        class="category-button {selectedCategory === genre ? 'active' : ''}"
-        on:click={() => filterCategory(genre)}>
-        {genre}
-      </button>
-    {/each}
-    <hr>
-
-    {#if selectedCategory === 'Összes'}
-      {#each Object.keys(categorizedMovies) as genre}
-        <h4>{genre}</h4>
-        <div class="row">
-          {#each categorizedMovies[genre].slice(0, 4) as movie}
-            <div class="col mb-4">
-              <div class="card">
-                <a href={`/movies/${movie.id}`} class="image-link">
-                  <div class="image-container">
-                    <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
-                    <div class="badge">{movie.averageRating.toFixed(1)}</div>
-                  </div>
-                </a>
-
-                <div class="card-body">
-                  <h5 class="card-title">{movie.title}</h5>
-                  <small class="text-muted">{movie.genre}</small>
-                </div>
-              </div>
-            </div>
-          {/each}
-          <button 
-            class="category-button" 
-            on:click={() => filterCategory(genre)}>Összes megjelenítése</button>
-        </div>
-      {/each}
-    {:else}
-      <h4>{selectedCategory}</h4>
-      <div class="row">
-        {#each categorizedMovies[selectedCategory] as movie}
-          <div class="col mb-4">
-            <div class="card">
-              <a href={`/movies/${movie.id}`} class="image-link">
-                <div class="image-container">
-                  <img src={movie.imageUrl || 'https://placehold.co/400x600'} class="card-img-top" alt={movie.title} />
-                  <div class="badge">{movie.averageRating.toFixed(1)}</div>
-                </div>
-              </a>
-
-              <div class="card-body">
-                <h5 class="card-title">{movie.title}</h5>
-                <small class="text-muted">{movie.genre}</small>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </div>
-</div>
-{/if}

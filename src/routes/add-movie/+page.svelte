@@ -112,7 +112,7 @@
 </script>
 
 <main>
-  <div class="container py-5 pt-5 w-75">
+  <div class="content py-5 pt-5 w-75">
     {#if showAlert}
       <div class="alert alert-success">
         {alertMessage}
@@ -128,7 +128,7 @@
             </div>
           </td>
           <td class="desc" style="padding-left:10px; padding-right:10px;">
-            <div class="content">
+            <div class="contents">
               <p>
                 <input type="text" placeholder="Cím" bind:value={title} />
               </p>
@@ -236,7 +236,7 @@
     100% { opacity: 0; display: none; }
   }
 
-  .container {
+  .content {
     margin-left: 300px;
     padding: 20px;
     color: white;
@@ -261,7 +261,7 @@
     align-items: center;
   }
 
-  .content,
+  .contents,
   .people {
     width: 100%;
     padding: 10px;
@@ -288,5 +288,72 @@
   input[type="checkbox"] {
     margin: 10px 0; /* Térköz a checkbox körül */
   }
+  @media screen and (max-width: 768px) {
+  table,
+  tbody,
+  tr {
+    display: block;
+    width: 100%;
+  }
+
+  td {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px; /* Távolság az elemek között */
+  }
+
+  .picture {
+    width: 100%; /* A kép konténer kitölti a szélességet */
+  }
+
+  .people {
+    width: 100%;
+    padding: 0;
+  }
+
+  .contents {
+    width: 100%;
+    padding: 0;
+  }
+
+  /* A szereplők és szerepek táblázat is rugalmas lesz */
+  .table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .table th,
+  .table td {
+    text-align: center;
+    display: block;
+    width: 100%;
+  }
+
+  /* A film létrehozása gomb középre igazítva */
+  .btn-success {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+  /* Tartalom reszponzív elhelyezése */
+  .content {
+    padding: 20px;
+    color: white;
+    margin-left: 60px; /* Mobilon kisebb eltolás */
+  }
+  
+  @media (min-width: 768px) {
+    .content {
+      margin-left: 100px; /* Tableten nagyobb */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .content {
+      margin-left: 300px; /* Nagy képernyőn teljes eltolás */
+    }
+  }
+
 </style>
 
