@@ -159,27 +159,21 @@
           <td>
             <div class="people">
               <table class="table table-dark table-striped">
-                <thead>
-                  <tr>
-                    <th>Szereplők</th>
-                    <th>Szerepek</th>
-                  </tr>
-                </thead>
                 <tbody>
                   <tr>
-                    <td>Rendező</td>
+                    <td class="hide">Rendező</td>
                     <td><input type="text" placeholder="Rendező" bind:value={director} /></td>
                   </tr>
                   <tr>
-                    <td></td>
+                    <td class="hide"></td>
                     <td><input id="actor1" type="text" placeholder="Színész" bind:value={actor1} /></td>
                   </tr>
                   <tr>
-                    <td>Színészek</td>
+                    <td class="hide">Színészek</td>
                     <td><input id="actor2" type="text" placeholder="Színész" bind:value={actor2} /></td>
                   </tr>
                   <tr>
-                    <td></td>
+                    <td class="hide"></td>
                     <td><input id="actor3" type="text" placeholder="Színész" bind:value={actor3} /></td>
                   </tr>
                 </tbody>
@@ -194,6 +188,7 @@
 </main>
 
 <style>
+  
   #isSeries{
     text-align: center;
     appearance: none;
@@ -295,6 +290,11 @@
     display: block;
     width: 100%;
   }
+  .hide{
+    display: none !important;
+  }
+
+  
 
   td {
     display: block;
