@@ -190,7 +190,8 @@ body {
 
 .wrapper {
   position: relative;
-  max-width: 100%;
+  max-width: 95%;
+  max-height: 95%;
   /* overflow: hidden; */
 }
 
