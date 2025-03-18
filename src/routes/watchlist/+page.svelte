@@ -118,19 +118,19 @@
     <div class="container mt-4">
       <h2 class="mb-5">Watchlist</h2>
       <div class="wrapper w-100">
-        <i id="left" class="bi bi-arrow-left bg-danger" on:click={() => moveCarousel('left')} style="display: {showLeftIcon ? 'block' : 'none'}"></i>
-        <div class="carousel" bind:this={carousel} on:mousedown={dragStart} on:touchstart={dragStart} on:mousemove={dragging} on:touchmove={dragging} on:mouseup={dragStop} on:touchend={dragStop}>
+        <button id="left" class="bi bi-arrow-left bg-danger" on:click={() => moveCarousel('left')} style="display: {showLeftIcon ? 'block' : 'none'}" aria-label="Előző"> </button>
+        <div class="carousel" role="button" bind:this={carousel} tabindex="0" on:mousedown={dragStart} on:touchstart={dragStart} on:mousemove={dragging} on:touchmove={dragging} on:mouseup={dragStop} on:touchend={dragStop}>
           {#each $movies as movie (movie.id)}
-          <div class="movie-item" on:click={() => handleMovieClick(movie.id)}>
-            <img src={movie.imageUrl} alt={movie.title} draggable="false">
-            <div class="movie-info">
-              <h3>{movie.title}</h3>
-              <p>{movie.genre}</p>
-            </div>
-          </div>
-          {/each}
+  <a href={`/movies/${movie.id}`} class="movie-item" role="button" tabindex="0">
+    <img src={movie.imageUrl} alt={movie.title} draggable="false">
+    <div class="movie-info">
+      <h3>{movie.title}</h3>
+      <p>{movie.genre}</p>
+    </div>
+  </a>
+{/each}
         </div>
-        <i id="right" class="bi bi-arrow-right bg-danger" on:click={() => moveCarousel('right')} style="display: {showRightIcon ? 'block' : 'none'}"></i>
+        <button id="right" class="bi bi-arrow-right bg-danger" on:click={() => moveCarousel('right')} style="display: {showRightIcon ? 'block' : 'none'}" aria-label="Következő"></button>
       </div>
     </div>
   </div>
@@ -161,15 +161,6 @@
   color: white;
 }
 
-body {
-  display: flex;
-  padding: 0 20px;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  background: #343F4F;
-}
-
 .content {
   padding: 20px;
   color: white;
@@ -195,7 +186,7 @@ body {
   /* overflow: hidden; */
 }
 
-.wrapper i {
+.wrapper button {
   position: absolute;
   top: 50%;
   height: 44px;
@@ -212,19 +203,19 @@ body {
   z-index: 100;
 }
 
-.wrapper i:active {
+.wrapper button:active {
   transform: translateY(-50%) scale(0.9);
 }
 
-.wrapper i:hover {
+.wrapper button:hover {
   background: #f2f2f2;
 }
 
-.wrapper i:first-child {
+.wrapper button:first-child {
   left: -22px;
 }
 
-.wrapper i:last-child {
+.wrapper button:last-child {
   right: -22px;
 }
 
@@ -237,19 +228,12 @@ body {
   white-space: nowrap;
 }
 
-.carousel.dragging {
-  cursor: grab;
-  scroll-behavior: auto;
-}
-
-.carousel.dragging img {
-  pointer-events: none;
-}
-
 .movie-item {
   flex: 0 0 calc(100% / 3);
   text-align: center;
   width: 100px;
+  text-decoration: none;
+  color: white;
 }
 
 .movie-item img {
@@ -289,7 +273,7 @@ body {
     flex: 0 0 100%;
   }
 
-  .wrapper i {
+  .wrapper button {
     display: block;
   }
 }

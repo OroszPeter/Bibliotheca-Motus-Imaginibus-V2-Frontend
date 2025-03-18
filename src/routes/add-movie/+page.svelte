@@ -275,7 +275,7 @@
     width: 100%; /* Az inputok kitöltik a td teljes szélességét */
   }
 
-  .table th,
+  
   .table td {
     vertical-align: middle;
   }
@@ -323,7 +323,6 @@
     overflow-x: auto;
   }
 
-  .table th,
   .table td {
     text-align: center;
     display: block;
